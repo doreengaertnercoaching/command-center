@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Doreen HQ">
+<meta name="theme-color" content="#cd006f">
+<title>Doreen – Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --m: #cd006f; --pl: #f6bacc; --pm: #e5749c;
+  --dark: #2b2b2b; --gold: #ffde59;
+  --bg: #fdf8f5; --surface: #fff; --s2: #fef4f8;
+  --border: rgba(205,0,111,0.12); --text: #2b2b2b; --muted: #8a7580;
+  --shadow: 0 2px 20px rgba(205,0,111,0.08);
+  --r: 16px; --rs: 10px;
+  --sidebar-w: 220px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overscroll-behavior:none;}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;overflow:hidden;}
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--dark);display:flex;flex-direction:column;overflow-y:auto;transition:transform .25s;}
+.main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+/* ── SIDEBAR ── */
+.sb-logo{padding:20px 20px 18px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sb-logo .name{font-family:'Playfair Display',serif;color:#fff;font-size:16px;font-weight:600;}
+.sb-logo .sub{color:var(--pl);font-size:11px;margin-top:2px;letter-spacing:.05em;}
+.sb-date{padding:14px 20px;color:rgba(255,255,255,.3);font-size:11px;letter-spacing:.06em;text-transform:uppercase;}
+.nav-sec{padding:16px 20px 5px;color:rgba(255,255,255,.22);font-size:10px;letter-spacing:.1em;text-transform:uppercase;}
+.nav{display:flex;align-items:center;gap:10px;padding:10px 20px;color:rgba(255,255,255,.5);font-size:13.5px;cursor:pointer;border-left:3px solid transparent;transition:all .18s;}
+.nav:hover{color:#fff;background:rgba(255,255,255,.05);}
+.nav.active{color:#fff;border-left-color:var(--m);background:rgba(205,0,111,.15);}
+.nav-icon{font-size:16px;width:20px;text-align:center;}
+
+/* ── MOBILE NAV ── */
+.mob-bar{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--dark);border-top:1px solid rgba(255,255,255,.08);z-index:200;padding-bottom:env(safe-area-inset-bottom);}
+.mob-tabs{display:flex;}
+.mob-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;color:rgba(255,255,255,.4);font-size:10px;cursor:pointer;transition:color .15s;}
+.mob-tab.active{color:var(--pl);}
+.mob-tab .mi{font-size:20px;}
+.mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:149;}
+.mob-overlay.open{display:block;}
+
+/* ── HAMBURGER ── */
+.ham{display:none;position:fixed;top:12px;left:12px;z-index:201;background:var(--dark);border:none;border-radius:8px;width:38px;height:38px;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.7);font-size:18px;}
+
+/* ── PAGE ── */
+.ph{padding:24px 28px 18px;border-bottom:1px solid var(--border);background:var(--surface);}
+.ph-title{font-family:'Playfair Display',serif;font-size:24px;color:var(--dark);}
+.ph-sub{font-size:13px;color:var(--muted);margin-top:3px;}
+.panel{display:none;}
+.panel.active{display:block;animation:fi .22s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.ca{padding:24px 28px;}
+
+/* ── COMPONENTS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);}
+.ch{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.ct{font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.cb{padding:18px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.field{margin-bottom:12px;}
+label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;}
+input,textarea,select{width:100%;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 13px;outline:none;transition:border .15s;-webkit-appearance:none;}
+input:focus,textarea:focus,select:focus{border-color:var(--m);background:#fff;}
+textarea{resize:vertical;line-height:1.6;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:8px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.bp{background:var(--m);color:#fff;} .bp:hover{background:#b0005f;}
+.bg2{background:transparent;color:var(--muted);border:1px solid var(--border);} .bg2:hover{background:var(--s2);color:var(--text);}
+.bsm{padding:5px 11px;font-size:12px;}
+.bgold{background:var(--gold);color:var(--dark);border:none;}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500;}
+.tp{background:var(--pl);color:var(--m);}
+.tg{background:#d4f4e2;color:#1a6e3f;}
+.tgo{background:var(--gold);color:#7a5e00;}
+.td{background:var(--dark);color:#fff;}
+.tb{background:#dceeff;color:#1a4f8e;}
+
+/* ── DASHBOARD ── */
+.greet-bar{background:linear-gradient(135deg,var(--m),var(--pm));border-radius:var(--r);padding:24px 28px;color:#fff;margin-bottom:20px;position:relative;overflow:hidden;}
+.greet-bar::after{content:'✦';position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:56px;opacity:.1;}
+.greet-bar h2{font-family:'Playfair Display',serif;font-size:20px;}
+.greet-bar p{font-size:12px;opacity:.85;margin-top:5px;}
+.sc{background:#fff;border:1px solid var(--border);border-radius:var(--rs);padding:14px 18px;}
+.sn{font-family:'Playfair Display',serif;font-size:26px;color:var(--m);}
+.sl{font-size:12px;color:var(--muted);margin-top:1px;}
+
+/* ── JOURNAL ── */
+.emrow{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
+.emb{background:var(--bg);border:1.5px solid var(--border);border-radius:30px;padding:6px 13px;font-size:13px;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;}
+.emb:hover,.emb.sel{background:var(--pl);border-color:var(--m);color:var(--m);}
+.jentry{border-left:3px solid var(--pl);padding:12px 16px;margin-bottom:12px;background:#fff;border-radius:0 var(--rs) var(--rs) 0;box-shadow:var(--shadow);}
+.jmeta{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
+.jdate{font-size:11px;color:var(--muted);}
+.jtxt{font-size:14px;line-height:1.7;}
+
+/* ── CALENDAR ── */
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.ch2{text-align:center;font-size:10px;color:var(--muted);font-weight:500;padding:6px 0;text-transform:uppercase;}
+.cd{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:7px;font-size:12px;cursor:pointer;transition:all .15s;position:relative;}
+.cd:hover{background:var(--s2);}
+.cd.today{background:var(--m);color:#fff;font-weight:600;}
+.cd.hev::after{content:'';position:absolute;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--pm);}
+.cd.today.hev::after{background:var(--gold);}
+.cd.om{color:#ddd;}
+.cd.sel{background:var(--pl);color:var(--m);font-weight:500;}
+.eitem{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.etime{font-size:12px;color:var(--m);font-weight:500;min-width:42px;}
+
+/* ── TODOS ── */
+.ti{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.ti:last-child{border-bottom:none;}
+.tck{width:20px;height:20px;border:2px solid var(--border);border-radius:6px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:1px;}
+.tck.done{background:var(--m);border-color:var(--m);color:#fff;font-size:11px;}
+.ttl{font-size:14px;color:var(--text);line-height:1.4;}
+.ttl.done{text-decoration:line-through;color:var(--muted);}
+.tmt{font-size:11px;color:var(--muted);margin-top:2px;}
+.tpr{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:6px;}
+.ph2{background:#e74c3c;}.pm2{background:var(--gold);}.pl2{background:#2ecc71;}
+
+/* ── PROJECTS ── */
+.pcard{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px;}
+.pname{font-family:'Playfair Display',serif;font-size:16px;color:var(--dark);}
+.pbar{height:5px;background:var(--bg);border-radius:3px;overflow:hidden;margin:10px 0;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--m),var(--pm));border-radius:3px;transition:width .5s;}
+.mtask{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);padding:4px 0;cursor:pointer;}
+.mtask.done{text-decoration:line-through;color:#ccc;}
+.mdot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0;}
+.mtask.done .mdot{background:var(--m);}
+
+/* ── KANBAN ── */
+.kanban{display:flex;gap:16px;overflow-x:auto;padding-bottom:16px;-webkit-overflow-scrolling:touch;}
+.kanban::-webkit-scrollbar{height:4px;}
+.kanban::-webkit-scrollbar-thumb{background:var(--pl);border-radius:2px;}
+.kcol{background:#f5f0f3;border-radius:var(--r);padding:14px;min-width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;}
+.khead{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.ktitle{font-size:13px;font-weight:500;color:var(--dark);display:flex;align-items:center;gap:7px;}
+.kbadge{background:#fff;border:1px solid var(--border);color:var(--muted);border-radius:20px;font-size:11px;padding:2px 8px;}
+.kcard{background:#fff;border:1px solid var(--border);border-radius:var(--rs);padding:13px;cursor:grab;transition:all .2s;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.kcard:active{cursor:grabbing;box-shadow:0 8px 24px rgba(205,0,111,.15);transform:rotate(1.5deg) scale(1.02);}
+.kcard.dragging{opacity:.4;}
+.kcard.drag-over{border:2px dashed var(--m);}
+.kcol.col-over{background:var(--pl);opacity:.85;}
+.ktag{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:500;margin-bottom:6px;}
+.ktag-i{background:var(--pl);color:var(--m);}
+.ktag-p{background:#e8e4ff;color:#5b4fcf;}
+.ktag-u{background:#fff3cd;color:#856404;}
+.ktag-l{background:#d4f4e2;color:#1a6e3f;}
+.kctitle{font-size:13px;font-weight:500;color:var(--dark);line-height:1.4;margin-bottom:5px;}
+.kcdesc{font-size:12px;color:var(--muted);line-height:1.5;}
+.kcmeta{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
+.kprio{width:6px;height:6px;border-radius:50%;}
+.k-add{background:transparent;border:1.5px dashed rgba(205,0,111,.25);color:var(--muted);border-radius:var(--rs);padding:10px;font-size:13px;cursor:pointer;width:100%;transition:all .15s;font-family:'DM Sans',sans-serif;}
+.k-add:hover{background:var(--pl);border-color:var(--m);color:var(--m);}
+
+/* ── NUGGETS ── */
+.npills{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px;}
+.npill{padding:7px 14px;border-radius:20px;font-size:13px;border:1.5px solid var(--border);cursor:pointer;transition:all .15s;background:#fff;font-family:'DM Sans',sans-serif;}
+.npill:hover,.npill.act{background:var(--m);color:#fff;border-color:var(--m);}
+.nugcard{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:14px;position:relative;}
+.nugcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--m);border-radius:var(--r) 0 0 var(--r);}
+.ntitle{font-family:'Playfair Display',serif;font-size:17px;color:var(--dark);margin-bottom:9px;}
+.ntxt{font-size:14px;line-height:1.75;color:#555;}
+.ntk{background:var(--s2);border-radius:var(--rs);padding:12px 15px;margin-top:13px;font-size:13px;color:var(--m);font-weight:500;}
+.ntk::before{content:'✦ Key Takeaway: ';}
+.spin2{display:inline-block;width:26px;height:26px;border:3px solid var(--pl);border-top-color:var(--m);border-radius:50%;animation:sp .8s linear infinite;margin-bottom:10px;}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ── BUSINESS ── */
+.prow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.pnum{width:26px;height:26px;background:var(--pl);color:var(--m);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.so{background:var(--gold);}.sg{background:#3498db;}.se{background:#2ecc71;}
+
+/* ── MODAL ── */
+.mover{display:none;position:fixed;inset:0;background:rgba(43,43,43,.45);z-index:300;align-items:center;justify-content:center;padding:16px;}
+.mover.open{display:flex;}
+.modal{background:#fff;border-radius:var(--r);padding:24px;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.15);max-height:90vh;overflow-y:auto;}
+.mtitle{font-family:'Playfair Display',serif;font-size:19px;margin-bottom:18px;}
+.mact{display:flex;gap:9px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--pl);border-radius:2px;}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:150;transform:translateX(-100%);width:240px;}
+  .sidebar.open{transform:translateX(0);}
+  .main{padding-bottom:70px;}
+  .ham{display:flex;}
+  .mob-bar{display:block;}
+  .g2,.g3,.g4{grid-template-columns:1fr;}
+  .g2-keep{grid-template-columns:1fr 1fr!important;}
+  .ca{padding:16px;}
+  .ph{padding:16px 16px 14px;}
+  .ph-title{font-size:20px;}
+  .kanban{gap:12px;}
+  .kcol{min-width:220px;}
+  .greet-bar{padding:18px 20px;}
+  .greet-bar h2{font-size:17px;}
+  input,select{font-size:16px;}
+}
+@media(min-width:769px){
+  .mob-bar,.ham,.mob-overlay{display:none!important;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="name">Doreen ✦</div>
+    <div class="sub">Command Center</div>
+  </div>
+  <div class="sb-date" id="sb-date"></div>
+  <div class="nav-sec">Übersicht</div>
+  <div class="nav active" data-p="dashboard" onclick="go('dashboard',this)"><span class="nav-icon">🏠</span><span>Dashboard</span></div>
+  <div class="nav-sec">Persönlich</div>
+  <div class="nav" data-p="journal" onclick="go('journal',this)"><span class="nav-icon">📓</span><span>Journal</span></div>
+  <div class="nav" data-p="kalender" onclick="go('kalender',this)"><span class="nav-icon">📅</span><span>Kalender</span></div>
+  <div class="nav" data-p="todos" onclick="go('todos',this)"><span class="nav-icon">✅</span><span>To-Dos</span></div>
+  <div class="nav-sec">Business</div>
+  <div class="nav" data-p="kanban" onclick="go('kanban',this)"><span class="nav-icon">🗂️</span><span>Projektor</span></div>
+  <div class="nav" data-p="projekte" onclick="go('projekte',this)"><span class="nav-icon">📁</span><span>Projekte</span></div>
+  <div class="nav" data-p="instagram" onclick="go('instagram',this)"><span class="nav-icon">📸</span><span>Instagram</span></div>
+  <div class="nav-sec">Wachstum</div>
+  <div class="nav" data-p="nuggets" onclick="go('nuggets',this)"><span class="nav-icon">✨</span><span>KI Lernnuggets</span></div>
+</aside>
+
+<!-- MOBILE OVERLAY -->
+<div class="mob-overlay" id="mob-overlay" onclick="closeSidebar()"></div>
+
+<!-- HAMBURGER -->
+<button class="ham" id="ham" onclick="toggleSidebar()">☰</button>
+
+<main class="main">
+
+<!-- DASHBOARD -->
+<div id="p-dashboard" class="panel active">
+  <div class="ph"><div class="ph-title" id="greet">Guten Morgen, Doreen ✦</div><div class="ph-sub" id="dash-date"></div></div>
+  <div class="ca">
+    <div class="greet-bar"><h2 id="mantra">"Du bist gut genug – genau jetzt."</h2><p>Dein heutiges Mantra</p></div>
+    <div class="g4" style="margin-bottom:20px;">
+      <div class="sc"><div class="sn" id="st-todos">0</div><div class="sl">Offene To-Dos</div></div>
+      <div class="sc"><div class="sn" id="st-j">0</div><div class="sl">Journaleinträge</div></div>
+      <div class="sc"><div class="sn" id="st-k">0</div><div class="sl">Kanban-Karten</div></div>
+      <div class="sc"><div class="sn">9</div><div class="sl">Posts offen</div></div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="ch"><span class="ct">Heutige Aufgaben</span><button class="btn bg2 bsm" onclick="go('todos',byp('todos'))">Alle →</button></div>
+        <div class="cb" id="dash-todos"></div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ct">Journal</span><button class="btn bg2 bsm" onclick="go('journal',byp('journal'))">Alle →</button></div>
+        <div class="cb" id="dash-j"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JOURNAL -->
+<div id="p-journal" class="panel">
+  <div class="ph"><div class="ph-title">Mein Journal</div><div class="ph-sub">Gedanken, Gefühle, tägliche Reflexion</div></div>
+  <div class="ca">
+    <div class="card" style="margin-bottom:20px;">
+      <div class="ch"><span class="ct">Neuer Eintrag</span></div>
+      <div class="cb">
+        <div class="field"><label>Wie fühlst Du Dich?</label>
+          <div class="emrow">
+            <button class="emb" onclick="selEm(this,'🌟 Energetisch')">🌟 Energetisch</button>
+            <button class="emb" onclick="selEm(this,'💪 Motiviert')">💪 Motiviert</button>
+            <button class="emb" onclick="selEm(this,'😌 Ruhig')">😌 Ruhig</button>
+            <button class="emb" onclick="selEm(this,'😰 Gestresst')">😰 Gestresst</button>
+            <button class="emb" onclick="selEm(this,'🤔 Nachdenklich')">🤔 Nachdenklich</button>
+            <button class="emb" onclick="selEm(this,'😔 Erschöpft')">😔 Erschöpft</button>
+            <button class="emb" onclick="selEm(this,'🎉 Freudig')">🎉 Freudig</button>
+            <button class="emb" onclick="selEm(this,'😟 Unsicher')">😟 Unsicher</button>
+          </div>
+        </div>
+        <div class="field"><label>Mein Gedanke</label><textarea id="j-input" rows="5" placeholder="Was beschäftigt Dich heute?..."></textarea></div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;">
+          <button class="btn bp" onclick="saveJ()">Speichern</button>
+          <button class="btn bgold" onclick="getPrompt()">✨ KI Impulsfrage</button>
+        </div>
+        <div id="j-prompt" style="display:none;margin-top:12px;background:var(--s2);border-radius:10px;padding:13px 15px;font-size:14px;color:var(--m);line-height:1.6;"></div>
+      </div>
+    </div>
+    <div id="j-list"></div>
+  </div>
+</div>
+
+<!-- KALENDER -->
+<div id="p-kalender" class="panel">
+  <div class="ph"><div class="ph-title">Kalender</div><div class="ph-sub">Termine & wichtige Daten</div></div>
+  <div class="ca">
+    <div class="g2" style="align-items:start;">
+      <div class="card">
+        <div class="ch">
+          <button class="btn bg2 bsm" onclick="chMon(-1)">←</button>
+          <span class="ct" id="cal-lbl" style="font-size:13px;color:var(--text);"></span>
+          <button class="btn bg2 bsm" onclick="chMon(1)">→</button>
+        </div>
+        <div class="cb"><div class="cg" id="cal-grid"></div></div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ct" id="cal-day-lbl">Heute</span><button class="btn bp bsm" onclick="openEvM()">+ Termin</button></div>
+        <div class="cb"><div id="ev-list"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TODOS -->
+<div id="p-todos" class="panel">
+  <div class="ph"><div class="ph-title">To-Dos</div><div class="ph-sub">Aufgaben & Erledigungen</div></div>
+  <div class="ca">
+    <div class="card" style="margin-bottom:18px;">
+      <div class="cb" style="display:flex;gap:9px;flex-wrap:wrap;">
+        <input id="t-inp" type="text" placeholder="Neue Aufgabe..." style="flex:1;min-width:160px;" onkeypress="if(event.key==='Enter')addT()">
+        <select id="t-prio" style="width:115px;"><option value="h">🔴 Hoch</option><option value="m" selected>🟡 Mittel</option><option value="l">🟢 Niedrig</option></select>
+        <select id="t-cat" style="width:125px;"><option>Persönlich</option><option>Business</option><option>Instagram</option><option>Lernen</option></select>
+        <button class="btn bp" onclick="addT()">+ Hinzufügen</button>
+      </div>
+    </div>
+    <div class="g2" style="align-items:start;">
+      <div class="card"><div class="ch"><span class="ct">Offen</span><span id="t-oc" class="tag tp">0</span></div><div class="cb" id="t-open"></div></div>
+      <div class="card"><div class="ch"><span class="ct">Erledigt</span><span id="t-dc" class="tag tg">0</span></div><div class="cb" id="t-done"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- KANBAN -->
+<div id="p-kanban" class="panel">
+  <div class="ph">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+      <div><div class="ph-title">Projektor</div><div class="ph-sub">Dein persönliches Trello – drag & drop</div></div>
+      <button class="btn bp" onclick="openKM()">+ Neue Karte</button>
+    </div>
+  </div>
+  <div class="ca">
+    <div class="kanban" id="kanban-board"></div>
+  </div>
+</div>
+
+<!-- PROJEKTE -->
+<div id="p-projekte" class="panel">
+  <div class="ph"><div class="ph-title">Projekte</div><div class="ph-sub">Business-Projekte im Überblick</div></div>
+  <div class="ca">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px;"><button class="btn bp" onclick="openProjM()">+ Neues Projekt</button></div>
+    <div id="proj-list"></div>
+  </div>
+</div>
+
+<!-- INSTAGRAM -->
+<div id="p-instagram" class="panel">
+  <div class="ph"><div class="ph-title">Instagram Content</div><div class="ph-sub">Clara – die smarte Karrierefrau · April / Mai 2026</div></div>
+  <div class="ca"><div class="card"><div class="ch"><span class="ct">Contentplan</span></div><div class="cb" id="ig-posts"></div></div></div>
+</div>
+
+<!-- NUGGETS -->
+<div id="p-nuggets" class="panel">
+  <div class="ph"><div class="ph-title">KI Lernnuggets ✨</div><div class="ph-sub">Wähle ein Thema – Dein persönliches Lernnugget wartet</div></div>
+  <div class="ca">
+    <div style="display:flex;gap:9px;margin-bottom:18px;flex-wrap:wrap;">
+      <input id="ntopic" type="text" placeholder="Eigenes Thema eingeben..." style="flex:1;min-width:180px;">
+      <button class="btn bp" onclick="loadN(document.getElementById('ntopic').value)">✨ Generieren</button>
+    </div>
+    <div class="npills">
+      <button class="npill" onclick="loadN('Selbstvertrauen als Führungsfrau')">Selbstvertrauen</button>
+      <button class="npill" onclick="loadN('Zeitmanagement für Führungskräfte')">Zeitmanagement</button>
+      <button class="npill" onclick="loadN('KI im Business-Alltag nutzen')">KI im Alltag</button>
+      <button class="npill" onclick="loadN('Grenzen setzen im Beruf')">Grenzen setzen</button>
+      <button class="npill" onclick="loadN('Personal Brand und Sichtbarkeit aufbauen')">Personal Brand</button>
+      <button class="npill" onclick="loadN('Wirkungsvolle Kommunikation und Präsenz')">Kommunikation</button>
+      <button class="npill" onclick="loadN('Work-Life-Balance als Führungskraft')">Work-Life-Balance</button>
+      <button class="npill" onclick="loadN('Emotionale Intelligenz in der Führung')">Emotionale Intelligenz</button>
+      <button class="npill" onclick="loadN('Delegation und Loslassen lernen')">Delegation</button>
+      <button class="npill" onclick="loadN('Resilienz und mentale Stärke')">Resilienz</button>
+      <button class="npill" onclick="loadN('Imposter-Syndrom als Führungsfrau überwinden')">Imposter-Syndrom</button>
+      <button class="npill" onclick="loadN('Nein sagen ohne schlechtes Gewissen')">Nein sagen</button>
+      <button class="npill" onclick="loadN('Erfolgreich Verhandeln als Frau')">Verhandeln</button>
+      <button class="npill" onclick="loadN('Feedbackkultur im Team aufbauen')">Feedback</button>
+    </div>
+    <div id="nug-out"></div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mob-bar">
+  <div class="mob-tabs">
+    <div class="mob-tab active" data-p="dashboard" onclick="go('dashboard',this);setMobTab(this)"><div class="mi">🏠</div><div>Home</div></div>
+    <div class="mob-tab" data-p="journal" onclick="go('journal',byp('journal'));setMobTab(this)"><div class="mi">📓</div><div>Journal</div></div>
+    <div class="mob-tab" data-p="kanban" onclick="go('kanban',byp('kanban'));setMobTab(this)"><div class="mi">🗂️</div><div>Projektor</div></div>
+    <div class="mob-tab" data-p="todos" onclick="go('todos',byp('todos'));setMobTab(this)"><div class="mi">✅</div><div>To-Dos</div></div>
+    <div class="mob-tab" data-p="nuggets" onclick="go('nuggets',byp('nuggets'));setMobTab(this)"><div class="mi">✨</div><div>Lernen</div></div>
+  </div>
+</div>
+
+<!-- MODAL: Event -->
+<div class="mover" id="m-ev">
+  <div class="modal">
+    <div class="mtitle">Neuer Termin</div>
+    <div class="field"><label>Titel</label><input id="ev-t" type="text" placeholder="z.B. Post 4 goes live"></div>
+    <div class="field"><label>Datum</label><input id="ev-d" type="date"></div>
+    <div class="field"><label>Uhrzeit</label><input id="ev-h" type="time" value="09:00"></div>
+    <div class="field"><label>Notiz</label><input id="ev-n" type="text" placeholder="optional"></div>
+    <div class="mact"><button class="btn bg2" onclick="cm('m-ev')">Abbrechen</button><button class="btn bp" onclick="saveEv()">Speichern</button></div>
+  </div>
+</div>
+
+<!-- MODAL: Kanban -->
+<div class="mover" id="m-kb">
+  <div class="modal">
+    <div class="mtitle">Neue Karte</div>
+    <div class="field"><label>Titel</label><input id="kb-t" type="text" placeholder="z.B. Post 5 Design erstellen"></div>
+    <div class="field"><label>Beschreibung</label><textarea id="kb-d" rows="3" placeholder="Details..."></textarea></div>
+    <div class="field"><label>Spalte</label>
+      <select id="kb-col">
+        <option value="0">💡 Ideen</option>
+        <option value="1">📋 Planung</option>
+        <option value="2">⚡ Umsetzung</option>
+        <option value="3">🚀 Live</option>
+      </select>
+    </div>
+    <div class="field"><label>Priorität</label>
+      <select id="kb-prio"><option value="h">🔴 Hoch</option><option value="m" selected>🟡 Mittel</option><option value="l">🟢 Niedrig</option></select>
+    </div>
+    <div class="field"><label>Kategorie</label>
+      <select id="kb-cat"><option>Instagram</option><option>Business</option><option>Persönlich</option><option>Lernen</option></select>
+    </div>
+    <div class="mact"><button class="btn bg2" onclick="cm('m-kb')">Abbrechen</button><button class="btn bp" onclick="saveKb()">Karte erstellen</button></div>
+  </div>
+</div>
+
+<!-- MODAL: Project -->
+<div class="mover" id="m-proj">
+  <div class="modal">
+    <div class="mtitle">Neues Projekt</div>
+    <div class="field"><label>Name</label><input id="pr-n" type="text" placeholder="z.B. Juni Contentplan"></div>
+    <div class="field"><label>Beschreibung</label><textarea id="pr-d" rows="3" placeholder="Worum geht es?"></textarea></div>
+    <div class="field"><label>Deadline</label><input id="pr-dl" type="date"></div>
+    <div class="mact"><button class="btn bg2" onclick="cm('m-proj')">Abbrechen</button><button class="btn bp" onclick="saveProj()">Speichern</button></div>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+function ld(k,d){try{return JSON.parse(localStorage.getItem(k))||d;}catch{return d;}}
+function sv(k,v){localStorage.setItem(k,JSON.stringify(v));}
+
+let J=ld('dc_j',[]);
+let T=ld('dc_t',[
+  {id:1,text:'Post 4 Canva Design erstellen',p:'h',cat:'Instagram',done:false},
+  {id:2,text:'Posts 1–3 in Metricool einplanen',p:'h',cat:'Business',done:false},
+  {id:3,text:'Juni Contentplan mit Claude starten',p:'m',cat:'Instagram',done:false},
+  {id:4,text:'KI Lernnugget: Delegation',p:'l',cat:'Lernen',done:false},
+]);
+let EV=ld('dc_ev',[
+  {id:1,date:'2026-04-22',time:'12:00',title:'Post 2 live',note:'Karussell – Kleinhalten'},
+  {id:2,date:'2026-04-24',time:'17:00',title:'Post 3 live',note:'Reel – Erfolgsjournal'},
+  {id:3,date:'2026-04-27',time:'09:00',title:'Post 4 live',note:'Reel – Morgenroutine'},
+  {id:4,date:'2026-05-15',time:'17:00',title:'Post 12 – Abschluss',note:'Reel – Monatsrückblick'},
+]);
+let PR=ld('dc_pr',[
+  {id:1,name:'Clara Contentplan Apr/Mai',desc:'12 Posts planen, designen & veröffentlichen',dl:'2026-05-15',tasks:['Posts 1–3 designen','Posts 4–6 designen','Posts 7–9 designen','Posts 10–12 designen','Metricool einplanen'],done:[0]},
+  {id:2,name:'Juni Contentplan',desc:'Neuen Monat mit Claude planen',dl:'2026-05-25',tasks:['Trends recherchieren','Themen festlegen','Excel-Plan erstellen'],done:[]},
+]);
+
+const COLS=['💡 Ideen','📋 Planung','⚡ Umsetzung','🚀 Live'];
+const CTAGS=['ktag-i','ktag-p','ktag-u','ktag-l'];
+let KB=ld('dc_kb',[
+  {id:1,title:'Canva Design Post 4',desc:'Reel Cover – Morgenroutine',col:1,p:'h',cat:'Instagram'},
+  {id:2,title:'Post 5 Caption schreiben',desc:'Karussell – Zeitfresser',col:0,p:'m',cat:'Instagram'},
+  {id:3,title:'Juni Themen brainstormen',desc:'Mit Claude recherchieren',col:0,p:'l',cat:'Business'},
+  {id:4,title:'Post 2 Canva – Kleinhalten',desc:'Karussell fertigstellen',col:2,p:'h',cat:'Instagram'},
+  {id:5,title:'Metricool Posts einplanen',desc:'Posts 1–3 schededulen',col:1,p:'h',cat:'Business'},
+]);
+
+const POSTS=[
+  {nr:1,d:'Mo 20.04.',t:'09:00',f:'Einzelbild',th:'Selbstzweifel',ti:'Du bist gut genug',s:'offen'},
+  {nr:2,d:'Mi 22.04.',t:'12:00',f:'Karussell',th:'Selbstzweifel',ti:'5 Gedanken die Dich kleinhalten',s:'geplant'},
+  {nr:3,d:'Fr 24.04.',t:'17:00',f:'Reel',th:'Selbstzweifel',ti:'Dein Erfolgsjournal',s:'offen'},
+  {nr:4,d:'Mo 27.04.',t:'09:00',f:'Reel',th:'Zeit & Energie',ti:'Morgenroutine',s:'offen'},
+  {nr:5,d:'Mi 29.04.',t:'12:00',f:'Karussell',th:'Zeit & Energie',ti:'5 Zeitfresser',s:'offen'},
+  {nr:6,d:'Fr 02.05.',t:'17:00',f:'Einzelbild',th:'Zeit & Energie',ti:'Nein sagen ist Führung',s:'offen'},
+  {nr:7,d:'Mo 04.05.',t:'09:00',f:'Karussell',th:'KI & Tools',ti:'KI ist Deine Assistentin',s:'offen'},
+  {nr:8,d:'Mi 06.05.',t:'12:00',f:'Reel',th:'KI & Tools',ti:'3 KI-Tools',s:'offen'},
+  {nr:9,d:'Fr 08.05.',t:'17:00',f:'Einzelbild',th:'KI & Tools',ti:'Keine Zeit für KI',s:'offen'},
+  {nr:10,d:'Mo 11.05.',t:'09:00',f:'Karussell',th:'Sichtbarkeit',ti:'Sichtbar ohne Dich zu verbiegen',s:'offen'},
+  {nr:11,d:'Mi 13.05.',t:'12:00',f:'Einzelbild',th:'Sichtbarkeit',ti:'Echte Führung braucht keine Ellenbogen',s:'offen'},
+  {nr:12,d:'Fr 15.05.',t:'17:00',f:'Reel',th:'Sichtbarkeit',ti:'Monatsrückblick',s:'offen'},
+];
+
+const MANTRAS=['"Du bist gut genug – genau jetzt."','"Deine Stimme hat Gewicht."','"Fertig ist besser als perfekt."','"Dein Erfolg darf sich leicht anfühlen."','"Nein sagen ist Führung."','"Sichtbar sein auf Deine Art."','"Wer bin ich, es NICHT zu tun?"'];
+
+// ── NAVIGATION ──
+function byp(p){return document.querySelector('.nav[data-p="'+p+'"]');}
+function go(p, navEl){
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
+  document.getElementById('p-'+p).classList.add('active');
+  if(navEl && navEl.classList && navEl.classList.contains('nav')) navEl.classList.add('active');
+  closeSidebar();
+  if(p==='dashboard')renderDash();
+  if(p==='journal')renderJ();
+  if(p==='kalender')renderCal();
+  if(p==='todos')renderT();
+  if(p==='kanban')renderKB();
+  if(p==='projekte')renderPR();
+  if(p==='instagram')renderIG();
+}
+function setMobTab(el){document.querySelectorAll('.mob-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('mob-overlay').classList.toggle('open');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('mob-overlay').classList.remove('open');}
+
+// ── INIT ──
+function init(){
+  const now=new Date();
+  const days=['So','Mo','Di','Mi','Do','Fr','Sa'];
+  document.getElementById('sb-date').textContent=days[now.getDay()]+', '+now.toLocaleDateString('de-DE',{day:'numeric',month:'short'});
+  document.getElementById('dash-date').textContent=now.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const h=now.getHours();
+  document.getElementById('greet').textContent=(h<12?'Guten Morgen':h<17?'Guten Tag':'Guten Abend')+', Doreen ✦';
+  document.getElementById('mantra').textContent=MANTRAS[now.getDay()%MANTRAS.length];
+  renderDash();renderCal();renderT();renderKB();renderPR();renderIG();
+}
+
+// ── DASHBOARD ──
+function renderDash(){
+  const open=T.filter(t=>!t.done);
+  document.getElementById('st-todos').textContent=open.length;
+  document.getElementById('st-j').textContent=J.length;
+  document.getElementById('st-k').textContent=KB.length;
+  document.getElementById('dash-todos').innerHTML=open.slice(0,4).map(t=>`
+    <div class="ti" style="padding:7px 0;">
+      <div class="tpr ${t.p==='h'?'ph2':t.p==='m'?'pm2':'pl2'}"></div>
+      <div style="flex:1;"><div class="ttl">${t.text}</div><div class="tmt">${t.cat}</div></div>
+    </div>`).join('')||'<div style="color:var(--muted);font-size:14px;padding:6px 0;">Alle erledigt 🎉</div>';
+  document.getElementById('dash-j').innerHTML=[...J].reverse().slice(0,3).map(e=>`
+    <div style="padding:7px 0;border-bottom:1px solid var(--border);">
+      <div style="font-size:11px;color:var(--muted);">${e.date}${e.em?' · <span class="tag tp" style="font-size:10px;">'+e.em+'</span>':''}</div>
+      <div style="font-size:13px;color:var(--text);margin-top:3px;line-height:1.5;">${e.txt.substring(0,85)}${e.txt.length>85?'...':''}</div>
+    </div>`).join('')||'<div style="color:var(--muted);font-size:14px;padding:6px 0;">Noch kein Eintrag 📓</div>';
+}
+
+// ── JOURNAL ──
+let selEmotion='';
+function selEm(b,e){document.querySelectorAll('.emb').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');selEmotion=e;}
+function saveJ(){
+  const txt=document.getElementById('j-input').value.trim();if(!txt)return;
+  J.push({id:Date.now(),date:new Date().toLocaleDateString('de-DE'),em:selEmotion,txt});
+  sv('dc_j',J);document.getElementById('j-input').value='';selEmotion='';
+  document.querySelectorAll('.emb').forEach(x=>x.classList.remove('sel'));
+  document.getElementById('j-prompt').style.display='none';
+  renderJ();renderDash();
+}
+function renderJ(){
+  document.getElementById('j-list').innerHTML=J.length?[...J].reverse().map(e=>`
+    <div class="jentry">
+      <div class="jmeta"><span class="jdate">${e.date}</span>${e.em?`<span class="tag tp">${e.em}</span>`:''}<button onclick="delJ(${e.id})" style="margin-left:auto;background:none;border:none;color:#ddd;cursor:pointer;font-size:14px;">✕</button></div>
+      <div class="jtxt">${e.txt.replace(/\n/g,'<br>')}</div>
+    </div>`).join(''):'<div style="color:var(--muted);text-align:center;padding:36px;font-size:14px;">Noch kein Eintrag. Fang heute an 🌸</div>';
+}
+function delJ(id){J=J.filter(e=>e.id!==id);sv('dc_j',J);renderJ();renderDash();}
+async function getPrompt(){
+  const el=document.getElementById('j-prompt');
+  el.style.display='block';el.textContent='✨ Wird generiert...';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:120,messages:[{role:'user',content:'Gib mir eine einzige tiefe, warmherzige Journalfrage für eine weibliche Führungskraft. Du-Anrede (groß), kurz, Deutsch. Nur die Frage.'}]})});
+    const d=await r.json();
+    el.textContent='✦ '+(d.content[0]?.text||'Was war heute Dein größter Moment der Stärke?');
+  }catch{el.textContent='✦ Was war heute Dein größter Moment der Stärke?';}
+}
+
+// ── KALENDER ──
+let calD=new Date(2026,3,1),selDay=null;
+function renderCal(){
+  const y=calD.getFullYear(),m=calD.getMonth();
+  document.getElementById('cal-lbl').textContent=calD.toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+  const fd=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate();
+  const today=new Date();
+  let html=['Mo','Di','Mi','Do','Fr','Sa','So'].map(d=>`<div class="ch2">${d}</div>`).join('');
+  const off=(fd+6)%7;
+  for(let i=0;i<off;i++)html+='<div class="cd om"></div>';
+  for(let d=1;d<=dim;d++){
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const iT=d===today.getDate()&&m===today.getMonth()&&y===today.getFullYear();
+    const hE=EV.some(e=>e.date===ds);
+    const iS=selDay===ds;
+    html+=`<div class="cd ${iT?'today':''} ${hE?'hev':''} ${iS?'sel':''}" onclick="pickDay('${ds}')">${d}</div>`;
+  }
+  document.getElementById('cal-grid').innerHTML=html;
+  renderEv();
+}
+function pickDay(ds){
+  selDay=ds;
+  const d=new Date(ds);
+  document.getElementById('cal-day-lbl').textContent=d.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});
+  renderCal();
+}
+function renderEv(){
+  const fd=selDay||new Date().toISOString().split('T')[0];
+  const de=EV.filter(e=>e.date===fd);
+  document.getElementById('ev-list').innerHTML=de.length?de.map(e=>`
+    <div class="eitem"><div class="etime">${e.time}</div>
+    <div style="flex:1;"><div style="font-size:14px;">${e.title}</div>${e.note?`<div style="font-size:12px;color:var(--muted);">${e.note}</div>`:''}</div>
+    <button onclick="delEv(${e.id})" style="background:none;border:none;color:#ddd;cursor:pointer;">✕</button></div>`).join(''):'<div style="color:var(--muted);font-size:14px;">Keine Termine.</div>';
+}
+function chMon(d){calD.setMonth(calD.getMonth()+d);selDay=null;renderCal();}
+function openEvM(){document.getElementById('m-ev').classList.add('open');document.getElementById('ev-d').value=selDay||'';}
+function saveEv(){
+  const t=document.getElementById('ev-t').value.trim();if(!t)return;
+  EV.push({id:Date.now(),date:document.getElementById('ev-d').value,time:document.getElementById('ev-h').value,title:t,note:document.getElementById('ev-n').value});
+  sv('dc_ev',EV);cm('m-ev');renderCal();
+}
+function delEv(id){EV=EV.filter(e=>e.id!==id);sv('dc_ev',EV);renderEv();}
+
+// ── TODOS ──
+function addT(){
+  const txt=document.getElementById('t-inp').value.trim();if(!txt)return;
+  T.push({id:Date.now(),text:txt,p:document.getElementById('t-prio').value,cat:document.getElementById('t-cat').value,done:false});
+  sv('dc_t',T);document.getElementById('t-inp').value='';renderT();renderDash();
+}
+function togT(id){const t=T.find(x=>x.id===id);if(t){t.done=!t.done;sv('dc_t',T);renderT();renderDash();}}
+function delT(id){T=T.filter(x=>x.id!==id);sv('dc_t',T);renderT();renderDash();}
+function renderT(){
+  const open=T.filter(x=>!x.done),done=T.filter(x=>x.done);
+  document.getElementById('t-oc').textContent=open.length;
+  document.getElementById('t-dc').textContent=done.length;
+  const r=list=>list.length?list.map(t=>`
+    <div class="ti">
+      <div class="tpr ${t.p==='h'?'ph2':t.p==='m'?'pm2':'pl2'}"></div>
+      <div class="tck ${t.done?'done':''}" onclick="togT(${t.id})">${t.done?'✓':''}</div>
+      <div style="flex:1;">
+        <div class="ttl ${t.done?'done':''}">${t.text}</div>
+        <div class="tmt"><span class="tag ${t.cat==='Instagram'?'tp':t.cat==='Business'?'td':t.cat==='Lernen'?'tb':'tgo'}" style="font-size:10px;">${t.cat}</span></div>
+      </div>
+      <button onclick="delT(${t.id})" style="background:none;border:none;color:#ddd;cursor:pointer;font-size:14px;">✕</button>
+    </div>`).join(''):'<div style="color:var(--muted);font-size:13px;padding:6px 0;">Leer ✨</div>';
+  document.getElementById('t-open').innerHTML=r(open);
+  document.getElementById('t-done').innerHTML=r(done);
+  document.getElementById('st-todos').textContent=open.length;
+}
+
+// ── KANBAN ──
+let dragId=null,dragColIdx=null;
+function renderKB(){
+  const board=document.getElementById('kanban-board');
+  board.innerHTML=COLS.map((col,ci)=>{
+    const cards=KB.filter(c=>c.col===ci);
+    return `<div class="kcol" data-col="${ci}" ondragover="kdragover(event,${ci})" ondrop="kdrop(event,${ci})" ondragleave="kdragleave(event)">
+      <div class="khead"><div class="ktitle">${col}<span class="kbadge">${cards.length}</span></div></div>
+      ${cards.map(c=>`
+        <div class="kcard" draggable="true" data-id="${c.id}"
+          ondragstart="kdragstart(event,${c.id})"
+          ondragend="kdragend(event)"
+          onclick="openKEdit(${c.id})">
+          <div class="ktag ${CTAGS[ci]}">${c.cat}</div>
+          <div class="kctitle">${c.title}</div>
+          ${c.desc?`<div class="kcdesc">${c.desc}</div>`:''}
+          <div class="kcmeta">
+            <div class="kprio" style="background:${c.p==='h'?'#e74c3c':c.p==='m'?'#f0b429':'#2ecc71'}"></div>
+            <button onclick="event.stopPropagation();delKb(${c.id})" style="background:none;border:none;color:#ddd;cursor:pointer;font-size:12px;">✕</button>
+          </div>
+        </div>`).join('')}
+      <button class="k-add" onclick="openKMcol(${ci})">+ Karte hinzufügen</button>
+    </div>`;
+  }).join('');
+  // Touch drag for mobile
+  setupTouchDrag();
+}
+function kdragstart(e,id){dragId=id;setTimeout(()=>{const el=e.target;el.classList.add('dragging');},0);}
+function kdragend(e){e.target.classList.remove('dragging');document.querySelectorAll('.kcol').forEach(c=>c.classList.remove('col-over'));}
+function kdragover(e,ci){e.preventDefault();document.querySelectorAll('.kcol').forEach(c=>c.classList.remove('col-over'));e.currentTarget.classList.add('col-over');}
+function kdragleave(e){e.currentTarget.classList.remove('col-over');}
+function kdrop(e,ci){
+  e.preventDefault();document.querySelectorAll('.kcol').forEach(c=>c.classList.remove('col-over'));
+  const c=KB.find(x=>x.id===dragId);if(c){c.col=ci;sv('dc_kb',KB);renderKB();document.getElementById('st-k').textContent=KB.length;}
+  dragId=null;
+}
+// Touch drag
+function setupTouchDrag(){
+  document.querySelectorAll('.kcard').forEach(card=>{
+    card.addEventListener('touchstart',ts,{passive:false});
+  });
+}
+let tcEl=null,tcId=null,tcClone=null;
+function ts(e){
+  e.preventDefault();
+  tcEl=e.currentTarget;
+  tcId=parseInt(tcEl.dataset.id);
+  const t=e.touches[0];
+  tcClone=tcEl.cloneNode(true);
+  tcClone.style.cssText=`position:fixed;z-index:999;pointer-events:none;opacity:.85;width:${tcEl.offsetWidth}px;transform:rotate(2deg) scale(1.03);left:${t.clientX-tcEl.offsetWidth/2}px;top:${t.clientY-30}px;`;
+  document.body.appendChild(tcClone);
+  tcEl.style.opacity='.3';
+  document.addEventListener('touchmove',tm,{passive:false});
+  document.addEventListener('touchend',te,{passive:false});
+}
+function tm(e){
+  e.preventDefault();
+  const t=e.touches[0];
+  if(tcClone){tcClone.style.left=(t.clientX-parseInt(tcClone.style.width)/2)+'px';tcClone.style.top=(t.clientY-30)+'px';}
+}
+function te(e){
+  document.removeEventListener('touchmove',tm);
+  document.removeEventListener('touchend',te);
+  if(tcClone){document.body.removeChild(tcClone);tcClone=null;}
+  if(tcEl){tcEl.style.opacity='';}
+  const t=e.changedTouches[0];
+  const el=document.elementFromPoint(t.clientX,t.clientY);
+  const col=el?.closest('.kcol');
+  if(col&&tcId){
+    const ci=parseInt(col.dataset.col);
+    const c=KB.find(x=>x.id===tcId);
+    if(c&&c.col!==ci){c.col=ci;sv('dc_kb',KB);renderKB();}
+  }
+  tcEl=null;tcId=null;
+}
+let kEditId=null;
+function openKM(){kEditId=null;document.getElementById('kb-t').value='';document.getElementById('kb-d').value='';document.getElementById('m-kb').classList.add('open');}
+function openKMcol(ci){openKM();document.getElementById('kb-col').value=ci;}
+function openKEdit(id){
+  const c=KB.find(x=>x.id===id);if(!c)return;
+  kEditId=id;
+  document.getElementById('kb-t').value=c.title;
+  document.getElementById('kb-d').value=c.desc||'';
+  document.getElementById('kb-col').value=c.col;
+  document.getElementById('kb-prio').value=c.p;
+  document.getElementById('kb-cat').value=c.cat;
+  document.getElementById('m-kb').classList.add('open');
+}
+function saveKb(){
+  const t=document.getElementById('kb-t').value.trim();if(!t)return;
+  if(kEditId){const c=KB.find(x=>x.id===kEditId);if(c){c.title=t;c.desc=document.getElementById('kb-d').value;c.col=parseInt(document.getElementById('kb-col').value);c.p=document.getElementById('kb-prio').value;c.cat=document.getElementById('kb-cat').value;}}
+  else{KB.push({id:Date.now(),title:t,desc:document.getElementById('kb-d').value,col:parseInt(document.getElementById('kb-col').value),p:document.getElementById('kb-prio').value,cat:document.getElementById('kb-cat').value});}
+  sv('dc_kb',KB);cm('m-kb');renderKB();document.getElementById('st-k').textContent=KB.length;
+}
+function delKb(id){KB=KB.filter(x=>x.id!==id);sv('dc_kb',KB);renderKB();document.getElementById('st-k').textContent=KB.length;}
+
+// ── PROJEKTE ──
+function renderPR(){
+  document.getElementById('proj-list').innerHTML=PR.map(p=>{
+    const pct=p.tasks.length?Math.round(p.done.length/p.tasks.length*100):0;
+    return `<div class="pcard">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+        <div><div class="pname">${p.name}</div><div style="font-size:13px;color:var(--muted);margin-top:3px;">${p.desc}</div></div>
+        <div style="text-align:right;margin-left:12px;flex-shrink:0;">
+          <span class="tag ${pct===100?'tg':'tp'}">${pct}%</span>
+          ${p.dl?`<div style="font-size:11px;color:var(--muted);margin-top:3px;">bis ${new Date(p.dl).toLocaleDateString('de-DE',{day:'numeric',month:'short'})}</div>`:''}
+        </div>
+      </div>
+      <div class="pbar"><div class="pfill" style="width:${pct}%"></div></div>
+      ${p.tasks.map((t,i)=>`<div class="mtask ${p.done.includes(i)?'done':''}" onclick="togPT(${p.id},${i})"><div class="mdot"></div>${t}</div>`).join('')}
+      <div style="margin-top:10px;"><button onclick="delPR(${p.id})" class="btn bg2 bsm">Entfernen</button></div>
+    </div>`;
+  }).join('')||'<div style="color:var(--muted);text-align:center;padding:36px;font-size:14px;">Noch keine Projekte 🚀</div>';
+}
+function togPT(pid,idx){const p=PR.find(x=>x.id===pid);if(!p)return;p.done.includes(idx)?p.done=p.done.filter(i=>i!==idx):p.done.push(idx);sv('dc_pr',PR);renderPR();}
+function delPR(id){PR=PR.filter(x=>x.id!==id);sv('dc_pr',PR);renderPR();}
+function openProjM(){document.getElementById('m-proj').classList.add('open');}
+function saveProj(){
+  const n=document.getElementById('pr-n').value.trim();if(!n)return;
+  PR.push({id:Date.now(),name:n,desc:document.getElementById('pr-d').value,dl:document.getElementById('pr-dl').value,tasks:[],done:[]});
+  sv('dc_pr',PR);cm('m-proj');renderPR();
+}
+
+// ── INSTAGRAM ──
+function renderIG(){
+  const tc={'Selbstzweifel':'tp','Zeit & Energie':'tgo','KI & Tools':'tg','Sichtbarkeit':'tb'};
+  document.getElementById('ig-posts').innerHTML=POSTS.map(p=>`
+    <div class="prow">
+      <div class="pnum">${p.nr}</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:500;">${p.ti}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${p.d} · ${p.t} · ${p.f} · <span class="tag ${tc[p.th]||'tp'}" style="font-size:10px;">${p.th}</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
+        <div class="sdot ${p.s==='geplant'?'sg':p.s==='erledigt'?'se':'so'}"></div>
+        <span style="font-size:12px;color:var(--muted);">${p.s}</span>
+      </div>
+    </div>`).join('');
+}
+
+// ── NUGGETS ──
+async function loadN(topic){
+  topic=topic.trim();if(!topic)return;
+  document.querySelectorAll('.npill').forEach(p=>p.classList.remove('act'));
+  const el=document.getElementById('nug-out');
+  el.innerHTML=`<div style="text-align:center;padding:36px;color:var(--muted);"><div class="spin2"></div><br>Lernnugget zu <strong>${topic}</strong> wird generiert...</div>`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:900,messages:[{role:'user',content:`Erstelle ein kompaktes, praxisnahes Lernnugget auf Deutsch zum Thema "${topic}" für eine weibliche Führungskraft (Clara – smarte Karrierefrau, 30–50 Jahre). Du-Anrede großgeschrieben (Du/Dir/Dein). Antworte NUR mit JSON ohne Markdown:\n{"title":"Titel max 8 Wörter","intro":"2 Sätze warmherziger Einstieg","punkte":["Punkt 1 (1-2 Sätze praxisnah)","Punkt 2","Punkt 3","Punkt 4"],"takeaway":"1 Satz kraftvolle Kernbotschaft"}`}]})});
+    const d=await r.json();
+    const p=JSON.parse((d.content[0]?.text||'{}').replace(/```json|```/g,'').trim());
+    const ts=topic.replace(/'/g,"\\'");
+    const tks=(p.takeaway||'').replace(/`/g,"'").replace(/'/g,"\\'");
+    el.innerHTML=`<div class="nugcard">
+      <div class="ntitle">${p.title||topic}</div>
+      <div class="ntxt">${p.intro||''}<br><br>${(p.punkte||[]).map((x,i)=>`<strong>${i+1}.</strong> ${x}`).join('<br><br>')}</div>
+      <div class="ntk">${p.takeaway||''}</div>
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn bg2 bsm" onclick="loadN('${ts}')">↺ Neues Nugget</button>
+        <button class="btn bgold bsm" onclick="saveNJ('${ts}','${tks}')">Im Journal speichern 📓</button>
+      </div>
+    </div>`;
+  }catch{el.innerHTML='<div style="color:var(--muted);padding:24px;text-align:center;font-size:14px;">Fehler – bitte erneut versuchen.</div>';}
+}
+function saveNJ(topic,tk){
+  J.push({id:Date.now(),date:new Date().toLocaleDateString('de-DE'),em:'✨ Gelernt',txt:`Lernnugget: ${topic}\n\nKey Takeaway: ${tk}`});
+  sv('dc_j',J);alert('Im Journal gespeichert! 📓');
+}
+
+// ── MODAL ──
+function cm(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.mover').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+init();
+</script>
+</body>
+</html>
