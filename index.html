@@ -236,7 +236,14 @@ textarea{resize:vertical;line-height:1.6;}
   <div class="nav" data-p="projekte" onclick="go('projekte',this)"><span class="nav-icon">📁</span><span>Projekte</span></div>
   <div class="nav" data-p="instagram" onclick="go('instagram',this)"><span class="nav-icon">📸</span><span>Instagram</span></div>
   <div class="nav-sec">Wachstum</div>
+  <div class="nav" data-p="reflexion" onclick="go('reflexion',this)"><span class="nav-icon">🪞</span><span>Wochen-Reflexion</span></div>
   <div class="nav" data-p="nuggets" onclick="go('nuggets',this)"><span class="nav-icon">✨</span><span>KI Lernnuggets</span></div>
+
+  <div style="margin-top:auto;padding:16px 20px;border-top:1px solid rgba(255,255,255,.08);">
+    <div style="font-size:10px;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">iCloud Sync</div>
+    <button onclick="exportData()" style="width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7);border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;font-family:inherit;margin-bottom:6px;display:flex;align-items:center;gap:6px;">☁️ Daten sichern</button>
+    <label style="width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7);border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;">📂 Daten laden<input type="file" accept=".json" onchange="importData(event)" style="display:none;"></label>
+  </div>
 </aside>
 
 <!-- MOBILE OVERLAY -->
@@ -370,6 +377,42 @@ textarea{resize:vertical;line-height:1.6;}
   <div class="ca"><div class="card"><div class="ch"><span class="ct">Contentplan</span></div><div class="cb" id="ig-posts"></div></div></div>
 </div>
 
+<!-- REFLEXION -->
+<div id="p-reflexion" class="panel">
+  <div class="ph">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+      <div><div class="ph-title">Wochen-Reflexion 🪞</div><div class="ph-sub">Deine persönliche Rückschau — jeden Sonntag</div></div>
+      <button class="btn bp" onclick="startReflexion()">✨ Neue Reflexion starten</button>
+    </div>
+  </div>
+  <div class="ca">
+    <div id="refl-reminder" style="display:none;background:linear-gradient(135deg,var(--m),var(--pm));border-radius:var(--r);padding:20px 24px;color:#fff;margin-bottom:20px;">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;margin-bottom:6px;">Es ist Sonntag — Zeit für Deine Wochen-Reflexion ✦</div>
+      <div style="font-size:13px;opacity:.9;margin-bottom:14px;">Nimm Dir 10 Minuten nur für Dich. Du hast es verdient.</div>
+      <button onclick="startReflexion()" style="background:#fff;color:var(--m);border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;">Jetzt starten →</button>
+    </div>
+    <div id="refl-active" style="display:none;">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="ch">
+          <span class="ct" id="refl-q-label">Frage 1 von 5</span>
+          <div style="flex:1;margin-left:16px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
+            <div id="refl-prog" style="height:100%;background:var(--m);border-radius:2px;transition:width .4s;width:20%;"></div>
+          </div>
+        </div>
+        <div class="cb">
+          <div id="refl-q" style="font-family:'Playfair Display',serif;font-size:17px;color:var(--dark);line-height:1.5;margin-bottom:16px;min-height:52px;"></div>
+          <textarea id="refl-ans" rows="5" placeholder="Schreib so viel oder so wenig Du möchtest..."></textarea>
+          <div style="display:flex;gap:9px;margin-top:14px;flex-wrap:wrap;">
+            <button class="btn bp" onclick="nextReflQ()" id="refl-next">Weiter →</button>
+            <button class="btn bg2" onclick="skipReflQ()">Überspringen</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="refl-list"></div>
+  </div>
+</div>
+
 <!-- NUGGETS -->
 <div id="p-nuggets" class="panel">
   <div class="ph"><div class="ph-title">KI Lernnuggets ✨</div><div class="ph-sub">Wähle ein Thema – Dein persönliches Lernnugget wartet</div></div>
@@ -408,6 +451,7 @@ textarea{resize:vertical;line-height:1.6;}
     <div class="mob-tab" data-p="journal" onclick="go('journal',byp('journal'));setMobTab(this)"><div class="mi">📓</div><div>Journal</div></div>
     <div class="mob-tab" data-p="kanban" onclick="go('kanban',byp('kanban'));setMobTab(this)"><div class="mi">🗂️</div><div>Projektor</div></div>
     <div class="mob-tab" data-p="todos" onclick="go('todos',byp('todos'));setMobTab(this)"><div class="mi">✅</div><div>To-Dos</div></div>
+    <div class="mob-tab" data-p="reflexion" onclick="go('reflexion',byp('reflexion'));setMobTab(this)"><div class="mi">🪞</div><div>Reflexion</div></div>
     <div class="mob-tab" data-p="nuggets" onclick="go('nuggets',byp('nuggets'));setMobTab(this)"><div class="mi">✨</div><div>Lernen</div></div>
   </div>
 </div>
@@ -524,6 +568,7 @@ function go(p, navEl){
   if(p==='kanban')renderKB();
   if(p==='projekte')renderPR();
   if(p==='instagram')renderIG();
+  if(p==='reflexion')renderRefl();
 }
 function setMobTab(el){document.querySelectorAll('.mob-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');}
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('mob-overlay').classList.toggle('open');}
@@ -538,7 +583,22 @@ function init(){
   const h=now.getHours();
   document.getElementById('greet').textContent=(h<12?'Guten Morgen':h<17?'Guten Tag':'Guten Abend')+', Doreen ✦';
   document.getElementById('mantra').textContent=MANTRAS[now.getDay()%MANTRAS.length];
+  checkSundayReminder();
   renderDash();renderCal();renderT();renderKB();renderPR();renderIG();
+}
+
+// ── SONNTAGS-ERINNERUNG ──
+function checkSundayReminder(){
+  const now=new Date();
+  if(now.getDay()===0){
+    const lastRefl=ld('dc_refl_last',null);
+    const today=now.toISOString().split('T')[0];
+    if(lastRefl!==today){
+      // Show subtle badge on nav
+      const navEl=document.querySelector('.nav[data-p="reflexion"]');
+      if(navEl){navEl.innerHTML+='<span style="background:var(--m);color:#fff;border-radius:20px;font-size:10px;padding:1px 6px;margin-left:auto;">Neu</span>';}
+    }
+  }
 }
 
 // ── DASHBOARD ──
@@ -829,6 +889,129 @@ function saveNJ(topic,tk){
 // ── MODAL ──
 function cm(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.mover').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+// ── WOCHEN-REFLEXION ──
+let REFL=ld('dc_refl',[]);
+let reflQuestions=[],reflAnswers=[],reflIdx=0;
+
+function renderRefl(){
+  const now=new Date();
+  const isSunday=now.getDay()===0;
+  const today=now.toISOString().split('T')[0];
+  const lastDone=ld('dc_refl_last',null);
+  document.getElementById('refl-reminder').style.display=(isSunday&&lastDone!==today)?'block':'none';
+  document.getElementById('refl-active').style.display='none';
+  const el=document.getElementById('refl-list');
+  el.innerHTML=REFL.length?[...REFL].reverse().map(r=>`
+    <div class="card" style="margin-bottom:14px;">
+      <div class="ch">
+        <span class="ct">${r.date} · KW ${r.kw}</span>
+        <button onclick="delRefl(${r.id})" style="background:none;border:none;color:#ddd;cursor:pointer;">✕</button>
+      </div>
+      <div class="cb">
+        ${r.answers.map((a,i)=>`
+          <div style="margin-bottom:14px;">
+            <div style="font-size:12px;color:var(--muted);font-weight:500;margin-bottom:4px;">${a.q}</div>
+            <div style="font-size:14px;line-height:1.6;color:var(--text);">${a.a||'<em style="color:var(--muted)">Übersprungen</em>'}</div>
+          </div>`).join('')}
+      </div>
+    </div>`).join(''):'<div style="color:var(--muted);text-align:center;padding:40px;font-size:14px;">Noch keine Reflexion. Starte Deine erste! 🪞</div>';
+}
+
+async function startReflexion(){
+  document.getElementById('refl-list').style.display='none';
+  document.getElementById('refl-reminder').style.display='none';
+  document.getElementById('refl-active').style.display='block';
+  document.getElementById('refl-q').textContent='✨ KI generiert Deine persönlichen Fragen...';
+  document.getElementById('refl-ans').value='';
+  document.getElementById('refl-next').disabled=true;
+  reflAnswers=[];reflIdx=0;
+  try{
+    const now=new Date();
+    const kw=getKW(now);
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:`Erstelle 5 tiefe, warmherzige Wochen-Reflexionsfragen für KW ${kw} für eine weibliche Führungskraft (Doreen, Instagram-Brand "Clara – die smarte Karrierefrau"). Du-Anrede großgeschrieben. Jede Frage auf einer neuen Zeile. Abwechslungsreich: Erfolge, Herausforderungen, Energie, Beziehungen, Ziele. Nur die 5 Fragen, keine Nummerierung, kein anderer Text.`}]})});
+    const d=await r.json();
+    reflQuestions=(d.content[0]?.text||'').split('\n').filter(q=>q.trim().length>5).slice(0,5);
+    if(reflQuestions.length<3)reflQuestions=['Was war Dein größter Erfolg diese Woche?','Was hat Dich Energie gekostet – und was hat Dir Energie gegeben?','Was möchtest Du nächste Woche anders machen?','Wofür bist Du diese Woche dankbar?','Was hast Du über Dich selbst gelernt?'];
+  }catch{reflQuestions=['Was war Dein größter Erfolg diese Woche?','Was hat Dich Energie gekostet – und was hat Dir Energie gegeben?','Was möchtest Du nächste Woche anders machen?','Wofür bist Du diese Woche dankbar?','Was hast Du über Dich selbst gelernt?'];}
+  showReflQ();
+  document.getElementById('refl-next').disabled=false;
+}
+
+function showReflQ(){
+  const total=reflQuestions.length;
+  document.getElementById('refl-q-label').textContent=`Frage ${reflIdx+1} von ${total}`;
+  document.getElementById('refl-prog').style.width=((reflIdx+1)/total*100)+'%';
+  document.getElementById('refl-q').textContent=reflQuestions[reflIdx]||'';
+  document.getElementById('refl-ans').value='';
+  document.getElementById('refl-next').textContent=reflIdx===total-1?'Abschließen ✓':'Weiter →';
+}
+
+function nextReflQ(){
+  const ans=document.getElementById('refl-ans').value.trim();
+  reflAnswers.push({q:reflQuestions[reflIdx],a:ans});
+  if(reflIdx<reflQuestions.length-1){reflIdx++;showReflQ();}
+  else{saveRefl();}
+}
+function skipReflQ(){
+  reflAnswers.push({q:reflQuestions[reflIdx],a:''});
+  if(reflIdx<reflQuestions.length-1){reflIdx++;showReflQ();}
+  else{saveRefl();}
+}
+function saveRefl(){
+  const now=new Date();
+  const today=now.toISOString().split('T')[0];
+  REFL.push({id:Date.now(),date:now.toLocaleDateString('de-DE'),kw:getKW(now),answers:reflAnswers});
+  sv('dc_refl',REFL);sv('dc_refl_last',today);
+  document.getElementById('refl-active').style.display='none';
+  document.getElementById('refl-list').style.display='block';
+  renderRefl();
+  // Also save summary to journal
+  const summary=reflAnswers.filter(a=>a.a).map(a=>`${a.q}\n${a.a}`).join('\n\n');
+  if(summary){J.push({id:Date.now(),date:now.toLocaleDateString('de-DE'),em:'🪞 Reflexion',txt:`Wochen-Reflexion KW ${getKW(now)}\n\n${summary}`});sv('dc_j',J);}
+  alert('Reflexion gespeichert und ins Journal übernommen! 🪞✨');
+}
+function delRefl(id){REFL=REFL.filter(r=>r.id!==id);sv('dc_refl',REFL);renderRefl();}
+function getKW(d){const jan1=new Date(d.getFullYear(),0,1);return Math.ceil(((d-jan1)/86400000+jan1.getDay()+1)/7);}
+
+// ── EXPORT / IMPORT (iCloud Sync) ──
+function exportData(){
+  const data={
+    version:1,
+    exported:new Date().toISOString(),
+    journal:J, todos:T, events:EV, projects:PR, kanban:KB, reflexion:REFL
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const date=new Date().toLocaleDateString('de-DE').replace(/\./g,'-');
+  a.href=url;a.download=`doreen-hq-backup-${date}.json`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  alert('✅ Daten gesichert!\n\nTipp: Verschiebe die Datei in Deinen iCloud Drive Ordner – dann ist sie auf iPhone & Mac verfügbar.');
+}
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!data.version)throw new Error('Ungültiges Format');
+      if(confirm('Alle aktuellen Daten werden durch die Backup-Daten ersetzt.\n\nFortfahren?')){
+        if(data.journal){J=data.journal;sv('dc_j',J);}
+        if(data.todos){T=data.todos;sv('dc_t',T);}
+        if(data.events){EV=data.events;sv('dc_ev',EV);}
+        if(data.projects){PR=data.projects;sv('dc_pr',PR);}
+        if(data.kanban){KB=data.kanban;sv('dc_kb',KB);}
+        if(data.reflexion){REFL=data.reflexion;sv('dc_refl',REFL);}
+        alert('✅ Daten erfolgreich geladen!\n\nExportiert am: '+new Date(data.exported).toLocaleString('de-DE'));
+        renderDash();renderT();renderKB();renderPR();
+      }
+    }catch{alert('❌ Fehler: Die Datei konnte nicht gelesen werden. Bitte nur Backup-Dateien von dieser App verwenden.');}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
 
 init();
 </script>
