@@ -19,7 +19,7 @@
   --r: 16px; --rs: 10px;
   --sidebar-w: 220px;
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+*{box-sizing:border-box;margin:0;padding:0;^^^^-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overscroll-behavior:none;}
 
 /* ── LAYOUT ── */
@@ -216,6 +216,14 @@ textarea{resize:vertical;line-height:1.6;}
 </style>
 </head>
 <body>
+<div class="api-bar" style="background:var(--bg);border-bottom:1px solid var(--border);">
+  <div style="max-width:980px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 28px;">
+    <label for="api-key-input" style="font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.05em;">Anthropic API Key</label>
+    <input id="api-key-input" type="password" placeholder="Claude API Key hier einfügen" style="flex:1;min-width:240px;max-width:520px;">
+    <button class="btn bg2" onclick="saveApiKey()" style="padding:8px 14px;">Speichern</button>
+    <span id="api-key-status" style="font-size:12px;color:var(--muted);">nicht gesetzt</span>
+  </div>
+</div>
 <div class="app">
 
 <!-- SIDEBAR -->
@@ -508,6 +516,13 @@ textarea{resize:vertical;line-height:1.6;}
 function ld(k,d){try{return JSON.parse(localStorage.getItem(k))||d;}catch{return d;}}
 function sv(k,v){localStorage.setItem(k,JSON.stringify(v));}
 
+const ANTHROPIC_API_KEY_STORAGE='anthropic_api_key';
+const ANTHROPIC_BASE_URL='https://api.anthropic.com';
+function getAnthropicKey(){return localStorage.getItem(ANTHROPIC_API_KEY_STORAGE)||'';}
+function saveApiKey(){const v=document.getElementById('api-key-input').value.trim();localStorage.setItem(ANTHROPIC_API_KEY_STORAGE,v);updateApiKeyUI();alert('API Key gespeichert');}
+function updateApiKeyUI(){const input=document.getElementById('api-key-input');const status=document.getElementById('api-key-status');if(!input||!status)return;input.value=getAnthropicKey();status.textContent=input.value ? 'gespeichert' : 'nicht gesetzt';}
+function fetchAnthropic(path, opts={}){const key=getAnthropicKey();if(!key){return Promise.reject(new Error('Anthropic API Key fehlt'));}const headers=Object.assign({'Content-Type':'application/json'},opts.headers||{});headers.Authorization='Bearer '+key;return fetch(ANTHROPIC_BASE_URL+path,Object.assign({},opts,{headers}));}
+
 let J=ld('dc_j',[]);
 let T=ld('dc_t',[
   {id:1,text:'Post 4 Canva Design erstellen',p:'h',cat:'Instagram',done:false},
@@ -576,6 +591,7 @@ function closeSidebar(){document.getElementById('sidebar').classList.remove('ope
 
 // ── INIT ──
 function init(){
+  updateApiKeyUI();
   const now=new Date();
   const days=['So','Mo','Di','Mi','Do','Fr','Sa'];
   document.getElementById('sb-date').textContent=days[now.getDay()]+', '+now.toLocaleDateString('de-DE',{day:'numeric',month:'short'});
@@ -642,7 +658,7 @@ async function getPrompt(){
   const el=document.getElementById('j-prompt');
   el.style.display='block';el.textContent='✨ Wird generiert...';
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:120,messages:[{role:'user',content:'Gib mir eine einzige tiefe, warmherzige Journalfrage für eine weibliche Führungskraft. Du-Anrede (groß), kurz, Deutsch. Nur die Frage.'}]})});
+    const r=await fetchAnthropic('/v1/messages',{method:'POST',body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:120,messages:[{role:'user',content:'Gib mir eine einzige tiefe, warmherzige Journalfrage für eine weibliche Führungskraft. Du-Anrede (groß), kurz, Deutsch. Nur die Frage.'}]})});
     const d=await r.json();
     el.textContent='✦ '+(d.content[0]?.text||'Was war heute Dein größter Moment der Stärke?');
   }catch{el.textContent='✦ Was war heute Dein größter Moment der Stärke?';}
@@ -865,7 +881,7 @@ async function loadN(topic){
   const el=document.getElementById('nug-out');
   el.innerHTML=`<div style="text-align:center;padding:36px;color:var(--muted);"><div class="spin2"></div><br>Lernnugget zu <strong>${topic}</strong> wird generiert...</div>`;
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:900,messages:[{role:'user',content:`Erstelle ein kompaktes, praxisnahes Lernnugget auf Deutsch zum Thema "${topic}" für eine weibliche Führungskraft (Clara – smarte Karrierefrau, 30–50 Jahre). Du-Anrede großgeschrieben (Du/Dir/Dein). Antworte NUR mit JSON ohne Markdown:\n{"title":"Titel max 8 Wörter","intro":"2 Sätze warmherziger Einstieg","punkte":["Punkt 1 (1-2 Sätze praxisnah)","Punkt 2","Punkt 3","Punkt 4"],"takeaway":"1 Satz kraftvolle Kernbotschaft"}`}]})});
+    const r=await fetchAnthropic('/v1/messages',{method:'POST',body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:900,messages:[{role:'user',content:`Erstelle ein kompaktes, praxisnahes Lernnugget auf Deutsch zum Thema "${topic}" für eine weibliche Führungskraft (Clara – smarte Karrierefrau, 30–50 Jahre). Du-Anrede großgeschrieben (Du/Dir/Dein). Antworte NUR mit JSON ohne Markdown:\n{"title":"Titel max 8 Wörter","intro":"2 Sätze warmherziger Einstieg","punkte":["Punkt 1 (1-2 Sätze praxisnah)","Punkt 2","Punkt 3","Punkt 4"],"takeaway":"1 Satz kraftvolle Kernbotschaft"}`}]})});
     const d=await r.json();
     const p=JSON.parse((d.content[0]?.text||'{}').replace(/```json|```/g,'').trim());
     const ts=topic.replace(/'/g,"\\'");
@@ -929,7 +945,7 @@ async function startReflexion(){
   try{
     const now=new Date();
     const kw=getKW(now);
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:`Erstelle 5 tiefe, warmherzige Wochen-Reflexionsfragen für KW ${kw} für eine weibliche Führungskraft (Doreen, Instagram-Brand "Clara – die smarte Karrierefrau"). Du-Anrede großgeschrieben. Jede Frage auf einer neuen Zeile. Abwechslungsreich: Erfolge, Herausforderungen, Energie, Beziehungen, Ziele. Nur die 5 Fragen, keine Nummerierung, kein anderer Text.`}]})});
+    const r=await fetchAnthropic('/v1/messages',{method:'POST',body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:`Erstelle 5 tiefe, warmherzige Wochen-Reflexionsfragen für KW ${kw} für eine weibliche Führungskraft (Doreen, Instagram-Brand "Clara – die smarte Karrierefrau"). Du-Anrede großgeschrieben. Jede Frage auf einer neuen Zeile. Abwechslungsreich: Erfolge, Herausforderungen, Energie, Beziehungen, Ziele. Nur die 5 Fragen, keine Nummerierung, kein anderer Text.`}]})});
     const d=await r.json();
     reflQuestions=(d.content[0]?.text||'').split('\n').filter(q=>q.trim().length>5).slice(0,5);
     if(reflQuestions.length<3)reflQuestions=['Was war Dein größter Erfolg diese Woche?','Was hat Dich Energie gekostet – und was hat Dir Energie gegeben?','Was möchtest Du nächste Woche anders machen?','Wofür bist Du diese Woche dankbar?','Was hast Du über Dich selbst gelernt?'];
@@ -1017,3 +1033,4 @@ init();
 </script>
 </body>
 </html>
+<command><H1></H1>
