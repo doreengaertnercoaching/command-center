@@ -380,7 +380,37 @@ textarea{resize:vertical;line-height:1.6;}
 <!-- INSTAGRAM -->
 <div id="p-instagram" class="panel">
   <div class="ph"><div class="ph-title">Instagram Content</div><div class="ph-sub">Clara – die smarte Karrierefrau · April / Mai 2026</div></div>
-  <div class="ca"><div class="card"><div class="ch"><span class="ct">Contentplan</span></div><div class="cb" id="ig-posts"></div></div></div>
+  <div class="ca">
+    <div class="g2" style="align-items:start;margin-bottom:16px;">
+      <div class="sc"><div class="sn" id="ig-stat-offen">0</div><div class="sl">Offen</div></div>
+      <div class="sc"><div class="sn" id="ig-stat-done">0</div><div class="sl">Erledigt</div></div>
+    </div>
+    <div id="ig-posts"></div>
+  </div>
+</div>
+
+<!-- MODAL: Post Detail -->
+<div class="mover" id="m-ig">
+  <div class="modal" style="max-width:540px;">
+    <div class="mtitle" id="ig-modal-title"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="ig-modal-meta"></div>
+    <div style="margin-bottom:12px;">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:500;margin-bottom:6px;">Caption</div>
+      <div id="ig-modal-caption" style="background:var(--bg);border-radius:8px;padding:12px;font-size:13px;line-height:1.7;white-space:pre-wrap;max-height:200px;overflow-y:auto;"></div>
+      <button onclick="copyCaption()" class="btn bg2 bsm" style="margin-top:8px;">Caption kopieren 📋</button>
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:500;margin-bottom:6px;">Hashtags</div>
+      <div id="ig-modal-hashtags" style="background:var(--bg);border-radius:8px;padding:10px;font-size:12px;color:#3498db;line-height:1.7;"></div>
+      <button onclick="copyHashtags()" class="btn bg2 bsm" style="margin-top:8px;">Hashtags kopieren 📋</button>
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:500;margin-bottom:8px;">Status ändern</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="ig-status-btns"></div>
+    </div>
+    <div id="ig-canva-btn" style="margin-bottom:14px;"></div>
+    <div class="mact"><button class="btn bg2" onclick="cm('m-ig')">Schließen</button></div>
+  </div>
 </div>
 
 <!-- REFLEXION -->
@@ -613,20 +643,20 @@ let KB=ld('dc_kb',[
   {id:5,title:'Metricool Posts einplanen',desc:'Posts 1–3 schededulen',col:1,p:'h',cat:'Business'},
 ]);
 
-const POSTS=[
-  {nr:1,d:'Mo 20.04.',t:'09:00',f:'Einzelbild',th:'Selbstzweifel',ti:'Du bist gut genug',s:'offen'},
-  {nr:2,d:'Mi 22.04.',t:'12:00',f:'Karussell',th:'Selbstzweifel',ti:'5 Gedanken die Dich kleinhalten',s:'geplant'},
-  {nr:3,d:'Fr 24.04.',t:'17:00',f:'Reel',th:'Selbstzweifel',ti:'Dein Erfolgsjournal',s:'offen'},
-  {nr:4,d:'Mo 27.04.',t:'09:00',f:'Reel',th:'Zeit & Energie',ti:'Morgenroutine',s:'offen'},
-  {nr:5,d:'Mi 29.04.',t:'12:00',f:'Karussell',th:'Zeit & Energie',ti:'5 Zeitfresser',s:'offen'},
-  {nr:6,d:'Fr 02.05.',t:'17:00',f:'Einzelbild',th:'Zeit & Energie',ti:'Nein sagen ist Führung',s:'offen'},
-  {nr:7,d:'Mo 04.05.',t:'09:00',f:'Karussell',th:'KI & Tools',ti:'KI ist Deine Assistentin',s:'offen'},
-  {nr:8,d:'Mi 06.05.',t:'12:00',f:'Reel',th:'KI & Tools',ti:'3 KI-Tools',s:'offen'},
-  {nr:9,d:'Fr 08.05.',t:'17:00',f:'Einzelbild',th:'KI & Tools',ti:'Keine Zeit für KI',s:'offen'},
-  {nr:10,d:'Mo 11.05.',t:'09:00',f:'Karussell',th:'Sichtbarkeit',ti:'Sichtbar ohne Dich zu verbiegen',s:'offen'},
-  {nr:11,d:'Mi 13.05.',t:'12:00',f:'Einzelbild',th:'Sichtbarkeit',ti:'Echte Führung braucht keine Ellenbogen',s:'offen'},
-  {nr:12,d:'Fr 15.05.',t:'17:00',f:'Reel',th:'Sichtbarkeit',ti:'Monatsrückblick',s:'offen'},
-];
+let IGPOSTS=ld('dc_ig',[
+  {nr:1,d:'Mo 20.04.',t:'09:00',f:'Einzelbild',th:'Selbstzweifel & Stärke',ti:'Du bist gut genug – genau jetzt',s:'offen',canva:'https://www.canva.com/d/CGU7AZCs9J3LM6P',caption:'Weißt Du, was das Mutigste ist, das Du heute tun kannst?\n\nNicht die perfekte Präsentation halten. Nicht noch schneller werden. Nicht noch mehr leisten.\n\nSondern Dir selbst glauben – dass das, was Du bereits bist, mehr als genug ist.\n\n75 % der weiblichen Führungskräfte kennen das Gefühl, nicht gut genug zu sein. Vielleicht gehörst Du auch dazu.\n\nDu bist nicht allein damit. Und Du musst daran nichts verstellen.\n\nSchreib mir: Wann hast Du zuletzt wirklich auf Dich selbst vertraut?\n\n#smartekarrierefrau',hashtags:'#karrierefrau #führungskraft #selbstvertrauen #empowerment'},
+  {nr:2,d:'Mi 22.04.',t:'12:00',f:'Karussell',th:'Selbstzweifel & Stärke',ti:'5 Gedanken die Dich kleinhalten',s:'geplant',canva:'https://www.canva.com/d/CGU7AZCs9J3LM6P',caption:'Dieser eine Gedanke kostet Dich mehr Energie als jedes Meeting.\n\nSlide 1: Ich bin nicht gut genug. → Ich bin bereit zu wachsen.\nSlide 2: Die anderen machen das besser. → Ich bringe meine eigene Stärke mit.\nSlide 3: Ich darf das nicht laut sagen. → Meine Stimme hat Gewicht.\nSlide 4: Ich muss erst perfekt sein. → Fertig ist besser als perfekt.\nSlide 5: Wer bin ich, das zu tun? → Wer bin ich, es NICHT zu tun?\n\nSpeicher Dir dieses Karussell – für den Moment, wenn der Zweifel anklopft.\n\nWelcher Satz trifft Dich am meisten?\n\n#selbstzweifel #mindset #impostorsyndrom',hashtags:'#karrierecoaching #frauenpower #führungskraft'},
+  {nr:3,d:'Fr 24.04.',t:'17:00',f:'Reel',th:'Selbstzweifel & Stärke',ti:'Dein Erfolgsjournal – 3 Minuten die alles verändern',s:'offen',canva:'',caption:'Ich habe 3 Monate lang jeden Abend dasselbe getan – und es hat mein Selbstbild komplett verändert.\n\nIch habe aufgeschrieben, was ich heute gut gemacht habe.\n\nNicht was schiefgelaufen ist. Nicht was ich morgen besser machen muss. Nur: Was war heute mein Erfolg?\n\nDein Gehirn sucht automatisch nach Fehlern. Das ist Biologie. Das Erfolgsjournal trainiert es um.\n\n3 Minuten. Jeden Abend. 30 Tage. Probier es aus.\n\nWas war Dein heutiger Erfolg? Schreib ihn in die Kommentare.\n\n#erfolgsjournal #selbstreflexion #täglichesritual',hashtags:'#mindsetroutine #journaling #womenleadership'},
+  {nr:4,d:'Mo 27.04.',t:'09:00',f:'Reel',th:'Zeit & Energie clever nutzen',ti:'Morgenroutine: 20 Minuten die Deinen Tag verändern',s:'offen',canva:'',caption:'Bevor ich meine Mails checke, tue ich diese eine Sache – und mein Tag läuft komplett anders.\n\nMeine 20-Minuten-Morgenroutine:\n5 Min – Stille. Kein Handy.\n5 Min – Schreiben: Was ist mein wichtigstes Ziel heute?\n5 Min – Bewegen. Dehnen oder kurzer Spaziergang.\n5 Min – Inspirierendes lesen.\n\nKeine 5-Uhr-Aufsteh-Challenge. Kein Biohacking. Nur 20 Minuten, die MIR gehören.\n\nHast Du eine Morgenroutine? Was hilft Dir am meisten?\n\n#morgenroutine #produktivität #zeitmanagement',hashtags:'#morgenmensch #successroutine #karrierefrau'},
+  {nr:5,d:'Mi 29.04.',t:'12:00',f:'Karussell',th:'Zeit & Energie clever nutzen',ti:'Diese 5 Zeitfresser kosten Dich täglich 2 Stunden',s:'offen',canva:'',caption:'Du arbeitest 8 Stunden – aber wie viel davon ist wirklich produktiv?\n\nSlide 2: Ständiges Mails checken → Feste Zeiten: 9, 13, 17 Uhr\nSlide 3: Meetings ohne Ziel → Jedes Meeting braucht eine Agenda.\nSlide 4: Multitasking → Eine Aufgabe. Voller Fokus.\nSlide 5: Perfektionismus bei Kleinem → 80% gut ist besser als 100% nie fertig.\nSlide 6: Nein sagen fällt schwer → Jedes Ja ist ein Nein zu Dir selbst.\n\nWelcher Zeitfresser steckt bei Dir drin?\n\n#zeitmanagement #produktivität #karrieretipps',hashtags:'#führungskraft #timemanagement #effizient'},
+  {nr:6,d:'Fr 02.05.',t:'17:00',f:'Einzelbild',th:'Zeit & Energie clever nutzen',ti:'Nein sagen ist kein Versagen – es ist Führung',s:'offen',canva:'',caption:'Das mutigste Wort im Büro ist manchmal nur zwei Buchstaben lang.\n\nN E I N.\n\nNicht weil Du faul bist. Nicht weil Dir das Team egal ist. Sondern weil Du weißt, was wirklich zählt.\n\nEchte Führung bedeutet: Prioritäten setzen. Grenzen halten. Energie schützen.\n\nNein zu sagen ist keine Schwäche. Es ist das Klarste, was Du für Dich und Dein Team tun kannst.\n\nFällt Dir Nein sagen schwer? Schreib mir.\n\n#neinsagen #grenzen #selbstfürsorge',hashtags:'#führungsstärke #karrierefrau #womenleadership'},
+  {nr:7,d:'Mo 04.05.',t:'09:00',f:'Karussell',th:'KI smart & entspannt nutzen',ti:'KI ist nicht Dein Konkurrent – sie ist Deine Assistentin',s:'offen',canva:'',caption:'Ich war auch skeptisch. Dann habe ich es ausprobiert – und 4 Stunden pro Woche zurückgewonnen.\n\nKI klingt nach Technik-Kram. Aber was, wenn KI wie eine Assistentin ist, die niemals müde wird?\n\nWelche Aufgabe würdest Du am liebsten abgeben?\n\n#ki #künstlicheintelligenz #digitalisierung',hashtags:'#aitools #chatgpt #claude #karrierefrau'},
+  {nr:8,d:'Mi 06.05.',t:'12:00',f:'Reel',th:'KI smart & entspannt nutzen',ti:'3 KI-Tools die Führungsfrauen Zeit schenken',s:'offen',canva:'',caption:'Diese 3 Tools nutze ich jede Woche – und sie haben meinen Arbeitsalltag komplett verändert.\n\nTool 1: Claude → Für Texte, Mails, Ideen.\nTool 2: Otter.ai → Transkribiert Meetings automatisch.\nTool 3: Canva mit KI → Professionelle Designs in 5 Minuten.\n\nWelches Tool klingt für Dich am spannendsten?\n\n#kitools #produktivitätstools #smarterarbeiten',hashtags:'#chatgpt #claude #canva #führungskraft'},
+  {nr:9,d:'Fr 08.05.',t:'17:00',f:'Einzelbild',th:'KI smart & entspannt nutzen',ti:'Du hast keine Zeit für KI – und genau das ändert KI',s:'offen',canva:'',caption:'Ich hab dafür keine Zeit. Das war mein Argument. Bis ich merkte, dass es das falsche war.\n\nKI lernst Du nicht, wenn Du Zeit hast. Du gewinnst Zeit, weil Du KI lernst.\n\n1 Stunde investiert. 4 Stunden pro Woche zurückgewonnen.\n\nWas hält Dich noch zurück?\n\n#zeitinvestition #ki #wachstumsmindset',hashtags:'#künstlicheintelligenz #karrierefrau #führungskraft'},
+  {nr:10,d:'Mo 11.05.',t:'09:00',f:'Karussell',th:'Sichtbarkeit & authentische Führung',ti:'Sichtbar sein ohne Dich zu verbiegen',s:'offen',canva:'',caption:'Sichtbarkeit bedeutet nicht, laut zu sein. Es bedeutet, Du selbst zu sein – und das zu zeigen.\n\nDein Weg. Deine Handschrift. Dein Tempo.\n\nWas hält Dich davon ab, sichtbarer zu sein?\n\n#sichtbarkeit #personalbrand #authentischführen',hashtags:'#führungskraft #karrierefrau #womenleadership'},
+  {nr:11,d:'Mi 13.05.',t:'12:00',f:'Einzelbild',th:'Sichtbarkeit & authentische Führung',ti:'Echte Führung braucht keine Ellenbogen',s:'offen',canva:'',caption:'Die stärksten Führungspersönlichkeiten die ich kenne haben eines gemeinsam – und es ist nicht Härte.\n\nEs ist Klarheit.\n\nSondern mit Herz, Haltung und Handschrift.\n\nWas bedeutet Führung für Dich?\n\n#führungsstil #weiblicheführung #herzlichführen',hashtags:'#führungskraft #karrierefrau #womenleadership'},
+  {nr:12,d:'Fr 15.05.',t:'17:00',f:'Reel',th:'Sichtbarkeit & authentische Führung',ti:'Monatsrückblick – was wir gemeinsam gelernt haben',s:'offen',canva:'',caption:'Vier Wochen. Vier Themen. Ein Ziel: Dein Erfolg soll sich leicht anfühlen.\n\nWas nimmst Du mit?\n\nIch freue mich auf den nächsten Monat mit Euch.\n\n#monatsrückblick #gemeinschaft #wachstum',hashtags:'#karrierefrau #führungskraft #womenleadership'},
+]);
 
 const MANTRAS=['"Du bist gut genug – genau jetzt."','"Deine Stimme hat Gewicht."','"Fertig ist besser als perfekt."','"Dein Erfolg darf sich leicht anfühlen."','"Nein sagen ist Führung."','"Sichtbar sein auf Deine Art."','"Wer bin ich, es NICHT zu tun?"'];
 
@@ -919,20 +949,63 @@ function saveProj(){
 }
 
 // ── INSTAGRAM ──
+let igModalIdx=null;
 function renderIG(){
-  const tc={'Selbstzweifel':'tp','Zeit & Energie':'tgo','KI & Tools':'tg','Sichtbarkeit':'tb'};
-  document.getElementById('ig-posts').innerHTML=POSTS.map(p=>`
-    <div class="prow">
-      <div class="pnum">${p.nr}</div>
-      <div style="flex:1;">
-        <div style="font-size:13px;font-weight:500;">${p.ti}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${p.d} · ${p.t} · ${p.f} · <span class="tag ${tc[p.th]||'tp'}" style="font-size:10px;">${p.th}</span></div>
+  const tc={'Selbstzweifel & Stärke':'tp','Zeit & Energie clever nutzen':'tgo','KI smart & entspannt nutzen':'tg','Sichtbarkeit & authentische Führung':'tb'};
+  const offen=IGPOSTS.filter(p=>p.s==='offen').length;
+  const done=IGPOSTS.filter(p=>p.s==='erledigt').length;
+  document.getElementById('ig-stat-offen').textContent=offen;
+  document.getElementById('ig-stat-done').textContent=done;
+  document.getElementById('ig-posts').innerHTML=`<div class="card"><div class="ch"><span class="ct">Contentplan</span></div><div class="cb" style="padding:0;">`+
+  IGPOSTS.map((p,i)=>`
+    <div onclick="openIGModal(${i})" style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+      <div style="width:26px;height:26px;background:var(--pl);color:var(--m);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;">${p.nr}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.ti}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${p.d} · ${p.t} · ${p.f}</div>
       </div>
-      <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
-        <div class="sdot ${p.s==='geplant'?'sg':p.s==='erledigt'?'se':'so'}"></div>
-        <span style="font-size:12px;color:var(--muted);">${p.s}</span>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+        <span class="tag ${tc[p.th]||'tp'}" style="font-size:10px;">${p.th.split(' ')[0]}</span>
+        <div style="width:8px;height:8px;border-radius:50%;background:${p.s==='erledigt'?'#2ecc71':p.s==='geplant'?'#3498db':'var(--gold)'};"></div>
+        <span style="font-size:11px;color:var(--muted);">${p.s}</span>
+        <span style="color:var(--muted);font-size:14px;">›</span>
       </div>
-    </div>`).join('');
+    </div>`).join('')+`</div></div>`;
+}
+
+function openIGModal(i){
+  igModalIdx=i;
+  const p=IGPOSTS[i];
+  document.getElementById('ig-modal-title').textContent=`Post ${p.nr} – ${p.ti}`;
+  document.getElementById('ig-modal-meta').innerHTML=`
+    <span class="tag tp">${p.f}</span>
+    <span class="tag tgo">${p.d} · ${p.t}</span>
+    <span class="tag tb">${p.th}</span>`;
+  document.getElementById('ig-modal-caption').textContent=p.caption||'Keine Caption vorhanden.';
+  document.getElementById('ig-modal-hashtags').textContent=p.hashtags||'';
+  document.getElementById('ig-status-btns').innerHTML=
+    ['offen','geplant','erledigt'].map(s=>`
+      <button onclick="setIGStatus('${s}')" class="btn ${p.s===s?'bp':'bg2'} bsm">${s==='offen'?'🟡':s==='geplant'?'🔵':'✅'} ${s}</button>`).join('');
+  document.getElementById('ig-canva-btn').innerHTML=p.canva?
+    `<a href="${p.canva}" target="_blank" class="btn bp bsm">🎨 In Canva öffnen →</a>`:'';
+  document.getElementById('m-ig').classList.add('open');
+}
+
+function setIGStatus(s){
+  if(igModalIdx===null)return;
+  IGPOSTS[igModalIdx].s=s;
+  sv('dc_ig',IGPOSTS);
+  openIGModal(igModalIdx);
+  renderIG();
+}
+
+function copyCaption(){
+  if(igModalIdx===null)return;
+  navigator.clipboard.writeText(IGPOSTS[igModalIdx].caption||'').then(()=>alert('Caption kopiert! 📋'));
+}
+function copyHashtags(){
+  if(igModalIdx===null)return;
+  navigator.clipboard.writeText(IGPOSTS[igModalIdx].hashtags||'').then(()=>alert('Hashtags kopiert! 📋'));
 }
 
 // ── LERNKARTEN ──
