@@ -19,7 +19,7 @@
   --r: 16px; --rs: 10px;
   --sidebar-w: 220px;
 }
-*{box-sizing:border-box;margin:0;padding:0;^^^^-webkit-tap-highlight-color:transparent;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overscroll-behavior:none;}
 
 /* ── LAYOUT ── */
@@ -216,14 +216,6 @@ textarea{resize:vertical;line-height:1.6;}
 </style>
 </head>
 <body>
-<div class="api-bar" style="background:var(--bg);border-bottom:1px solid var(--border);">
-  <div style="max-width:980px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 28px;">
-    <label for="api-key-input" style="font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.05em;">Anthropic API Key</label>
-    <input id="api-key-input" type="password" placeholder="Claude API Key hier einfügen" style="flex:1;min-width:240px;max-width:520px;">
-    <button class="btn bg2" onclick="saveApiKey()" style="padding:8px 14px;">Speichern</button>
-    <span id="api-key-status" style="font-size:12px;color:var(--muted);">nicht gesetzt</span>
-  </div>
-</div>
 <div class="app">
 
 <!-- SIDEBAR -->
@@ -248,6 +240,12 @@ textarea{resize:vertical;line-height:1.6;}
   <div class="nav" data-p="nuggets" onclick="go('nuggets',this)"><span class="nav-icon">✨</span><span>KI Lernnuggets</span></div>
 
   <div style="margin-top:auto;padding:16px 20px;border-top:1px solid rgba(255,255,255,.08);">
+    <div style="font-size:10px;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">API Key</div>
+    <div style="display:flex;gap:5px;margin-bottom:10px;">
+      <input id="api-key-input" type="password" placeholder="sk-ant-..." style="flex:1;font-size:11px;padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;min-width:0;" value="">
+      <button onclick="saveApiKey()" style="background:var(--m);border:none;color:#fff;border-radius:6px;padding:6px 8px;font-size:11px;cursor:pointer;white-space:nowrap;">Speichern</button>
+    </div>
+    <div id="api-key-status" style="font-size:10px;margin-bottom:10px;"></div>
     <div style="font-size:10px;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">iCloud Sync</div>
     <button onclick="exportData()" style="width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7);border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;font-family:inherit;margin-bottom:6px;display:flex;align-items:center;gap:6px;">☁️ Daten sichern</button>
     <label style="width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7);border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;">📂 Daten laden<input type="file" accept=".json" onchange="importData(event)" style="display:none;"></label>
@@ -423,29 +421,100 @@ textarea{resize:vertical;line-height:1.6;}
 
 <!-- NUGGETS -->
 <div id="p-nuggets" class="panel">
-  <div class="ph"><div class="ph-title">KI Lernnuggets ✨</div><div class="ph-sub">Wähle ein Thema – Dein persönliches Lernnugget wartet</div></div>
+  <div class="ph"><div class="ph-title">Lernkarten ✨</div><div class="ph-sub">Wähle ein Thema – blättern & umdrehen zum Lernen</div></div>
   <div class="ca">
-    <div style="display:flex;gap:9px;margin-bottom:18px;flex-wrap:wrap;">
+    <div style="display:flex;gap:9px;margin-bottom:16px;flex-wrap:wrap;">
       <input id="ntopic" type="text" placeholder="Eigenes Thema eingeben..." style="flex:1;min-width:180px;">
-      <button class="btn bp" onclick="loadN(document.getElementById('ntopic').value)">✨ Generieren</button>
+      <button class="btn bp" onclick="loadN(document.getElementById('ntopic').value)">✨ Karten generieren</button>
     </div>
     <div class="npills">
       <button class="npill" onclick="loadN('Selbstvertrauen als Führungsfrau')">Selbstvertrauen</button>
       <button class="npill" onclick="loadN('Zeitmanagement für Führungskräfte')">Zeitmanagement</button>
       <button class="npill" onclick="loadN('KI im Business-Alltag nutzen')">KI im Alltag</button>
       <button class="npill" onclick="loadN('Grenzen setzen im Beruf')">Grenzen setzen</button>
-      <button class="npill" onclick="loadN('Personal Brand und Sichtbarkeit aufbauen')">Personal Brand</button>
+      <button class="npill" onclick="loadN('Personal Brand und Sichtbarkeit')">Personal Brand</button>
       <button class="npill" onclick="loadN('Wirkungsvolle Kommunikation und Präsenz')">Kommunikation</button>
       <button class="npill" onclick="loadN('Work-Life-Balance als Führungskraft')">Work-Life-Balance</button>
       <button class="npill" onclick="loadN('Emotionale Intelligenz in der Führung')">Emotionale Intelligenz</button>
       <button class="npill" onclick="loadN('Delegation und Loslassen lernen')">Delegation</button>
       <button class="npill" onclick="loadN('Resilienz und mentale Stärke')">Resilienz</button>
-      <button class="npill" onclick="loadN('Imposter-Syndrom als Führungsfrau überwinden')">Imposter-Syndrom</button>
+      <button class="npill" onclick="loadN('Imposter-Syndrom überwinden')">Imposter-Syndrom</button>
       <button class="npill" onclick="loadN('Nein sagen ohne schlechtes Gewissen')">Nein sagen</button>
       <button class="npill" onclick="loadN('Erfolgreich Verhandeln als Frau')">Verhandeln</button>
       <button class="npill" onclick="loadN('Feedbackkultur im Team aufbauen')">Feedback</button>
     </div>
-    <div id="nug-out"></div>
+
+    <!-- Ladeanimation -->
+    <div id="nug-loading" style="display:none;text-align:center;padding:48px;color:var(--muted);">
+      <div class="spin2"></div><br>
+      <div style="font-size:14px;margin-top:8px;">Lernkarten werden generiert...</div>
+    </div>
+
+    <!-- Karten-Deck -->
+    <div id="nug-deck" style="display:none;">
+      <!-- Fortschritt -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:13px;color:var(--muted);">Karte <span id="nc-cur">1</span> von <span id="nc-tot">5</span></div>
+        <div style="display:flex;gap:6px;" id="nc-dots"></div>
+        <div style="font-size:12px;color:var(--muted);">Tippe die Karte zum Umdrehen</div>
+      </div>
+
+      <!-- Die Karte -->
+      <div style="perspective:1200px;margin-bottom:20px;">
+        <div id="nc-card" onclick="flipCard()" style="
+          position:relative;width:100%;max-width:520px;margin:0 auto;
+          height:340px;cursor:pointer;
+          transform-style:preserve-3d;transition:transform 0.6s cubic-bezier(.4,0,.2,1);">
+
+          <!-- VORDERSEITE -->
+          <div id="nc-front" style="
+            position:absolute;inset:0;backface-visibility:hidden;
+            border-radius:var(--r);overflow:hidden;
+            box-shadow:0 8px 32px rgba(205,0,111,0.15);">
+            <img id="nc-img" src="" alt="" style="width:100%;height:200px;object-fit:cover;display:block;">
+            <div style="padding:20px;background:#fff;">
+              <div id="nc-topic-tag" style="font-size:11px;color:var(--m);font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;"></div>
+              <div id="nc-front-title" style="font-family:'Playfair Display',serif;font-size:20px;color:var(--dark);line-height:1.3;"></div>
+              <div style="margin-top:12px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px;">↩ Umdrehen für die Antwort</div>
+            </div>
+          </div>
+
+          <!-- RÜCKSEITE -->
+          <div id="nc-back" style="
+            position:absolute;inset:0;backface-visibility:hidden;
+            transform:rotateY(180deg);
+            border-radius:var(--r);overflow:hidden;
+            background:linear-gradient(135deg,var(--m),var(--pm));
+            box-shadow:0 8px 32px rgba(205,0,111,0.25);
+            padding:24px;display:flex;flex-direction:column;justify-content:space-between;">
+            <div>
+              <div style="font-size:11px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Key Takeaway</div>
+              <div id="nc-back-text" style="font-family:'Playfair Display',serif;font-size:18px;color:#fff;line-height:1.5;"></div>
+            </div>
+            <div>
+              <div id="nc-back-points" style="margin-top:14px;"></div>
+              <div style="margin-top:16px;font-size:12px;color:rgba(255,255,255,.6);">↩ Zurückdrehen</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px;">
+        <button onclick="prevCard()" class="btn bg2" id="nc-prev">← Zurück</button>
+        <button onclick="nextCard()" class="btn bp" id="nc-next">Weiter →</button>
+      </div>
+
+      <!-- Aktionen -->
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn bgold bsm" onclick="saveCardToJournal()">Im Journal speichern 📓</button>
+        <button class="btn bg2 bsm" onclick="loadN(currentTopic)">↺ Neue Karten</button>
+      </div>
+    </div>
+
+    <div id="nug-empty" style="text-align:center;padding:48px;color:var(--muted);font-size:14px;">
+      Wähle ein Thema oben — Deine Lernkarten warten! ✨
+    </div>
   </div>
 </div>
 
@@ -516,13 +585,6 @@ textarea{resize:vertical;line-height:1.6;}
 function ld(k,d){try{return JSON.parse(localStorage.getItem(k))||d;}catch{return d;}}
 function sv(k,v){localStorage.setItem(k,JSON.stringify(v));}
 
-const ANTHROPIC_API_KEY_STORAGE='anthropic_api_key';
-const ANTHROPIC_BASE_URL='https://api.anthropic.com';
-function getAnthropicKey(){return localStorage.getItem(ANTHROPIC_API_KEY_STORAGE)||'';}
-function saveApiKey(){const v=document.getElementById('api-key-input').value.trim();localStorage.setItem(ANTHROPIC_API_KEY_STORAGE,v);updateApiKeyUI();alert('API Key gespeichert');}
-function updateApiKeyUI(){const input=document.getElementById('api-key-input');const status=document.getElementById('api-key-status');if(!input||!status)return;input.value=getAnthropicKey();status.textContent=input.value ? 'gespeichert' : 'nicht gesetzt';}
-function fetchAnthropic(path, opts={}){const key=getAnthropicKey();if(!key){return Promise.reject(new Error('Anthropic API Key fehlt'));}const headers=Object.assign({'Content-Type':'application/json'},opts.headers||{});headers.Authorization='Bearer '+key;return fetch(ANTHROPIC_BASE_URL+path,Object.assign({},opts,{headers}));}
-
 let J=ld('dc_j',[]);
 let T=ld('dc_t',[
   {id:1,text:'Post 4 Canva Design erstellen',p:'h',cat:'Instagram',done:false},
@@ -591,7 +653,6 @@ function closeSidebar(){document.getElementById('sidebar').classList.remove('ope
 
 // ── INIT ──
 function init(){
-  updateApiKeyUI();
   const now=new Date();
   const days=['So','Mo','Di','Mi','Do','Fr','Sa'];
   document.getElementById('sb-date').textContent=days[now.getDay()]+', '+now.toLocaleDateString('de-DE',{day:'numeric',month:'short'});
@@ -599,6 +660,7 @@ function init(){
   const h=now.getHours();
   document.getElementById('greet').textContent=(h<12?'Guten Morgen':h<17?'Guten Tag':'Guten Abend')+', Doreen ✦';
   document.getElementById('mantra').textContent=MANTRAS[now.getDay()%MANTRAS.length];
+  checkApiKey();
   checkSundayReminder();
   renderDash();renderCal();renderT();renderKB();renderPR();renderIG();
 }
@@ -658,8 +720,7 @@ async function getPrompt(){
   const el=document.getElementById('j-prompt');
   el.style.display='block';el.textContent='✨ Wird generiert...';
   try{
-    const r=await fetchAnthropic('/v1/messages',{method:'POST',body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:120,messages:[{role:'user',content:'Gib mir eine einzige tiefe, warmherzige Journalfrage für eine weibliche Führungskraft. Du-Anrede (groß), kurz, Deutsch. Nur die Frage.'}]})});
-    const d=await r.json();
+    const d=await claudeFetch('Gib mir eine einzige tiefe, warmherzige Journalfrage für eine weibliche Führungskraft. Du-Anrede (groß), kurz, Deutsch. Nur die Frage.',120);
     el.textContent='✦ '+(d.content[0]?.text||'Was war heute Dein größter Moment der Stärke?');
   }catch{el.textContent='✦ Was war heute Dein größter Moment der Stärke?';}
 }
@@ -874,35 +935,129 @@ function renderIG(){
     </div>`).join('');
 }
 
-// ── NUGGETS ──
+// ── LERNKARTEN ──
+let ncCards=[],ncIdx=0,ncFlipped=false,currentTopic='';
+
+const UNSPLASH_TOPICS={
+  'Selbstvertrauen':'confident+woman+leader',
+  'Zeitmanagement':'time+management+woman',
+  'KI':'artificial+intelligence+technology',
+  'Grenzen':'mindfulness+woman+calm',
+  'Personal Brand':'personal+branding+woman',
+  'Kommunikation':'business+communication+woman',
+  'Work-Life':'work+life+balance+woman',
+  'Emotional':'emotional+intelligence+woman',
+  'Delegation':'team+leadership+woman',
+  'Resilienz':'strong+woman+resilience',
+  'Imposter':'confidence+woman+success',
+  'Nein':'boundaries+woman+professional',
+  'Verhandeln':'negotiation+business+woman',
+  'Feedback':'team+meeting+woman',
+};
+
+function getImgUrl(topic){
+  const key=Object.keys(UNSPLASH_TOPICS).find(k=>topic.includes(k))||'leadership+woman';
+  const query=UNSPLASH_TOPICS[key]||'leadership+woman';
+  const seed=topic.length+topic.charCodeAt(0);
+  return `https://source.unsplash.com/800x400/?${query}&sig=${seed}`;
+}
+
 async function loadN(topic){
   topic=topic.trim();if(!topic)return;
+  currentTopic=topic;
   document.querySelectorAll('.npill').forEach(p=>p.classList.remove('act'));
-  const el=document.getElementById('nug-out');
-  el.innerHTML=`<div style="text-align:center;padding:36px;color:var(--muted);"><div class="spin2"></div><br>Lernnugget zu <strong>${topic}</strong> wird generiert...</div>`;
+  document.getElementById('nug-empty').style.display='none';
+  document.getElementById('nug-deck').style.display='none';
+  document.getElementById('nug-loading').style.display='block';
+
   try{
-    const r=await fetchAnthropic('/v1/messages',{method:'POST',body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:900,messages:[{role:'user',content:`Erstelle ein kompaktes, praxisnahes Lernnugget auf Deutsch zum Thema "${topic}" für eine weibliche Führungskraft (Clara – smarte Karrierefrau, 30–50 Jahre). Du-Anrede großgeschrieben (Du/Dir/Dein). Antworte NUR mit JSON ohne Markdown:\n{"title":"Titel max 8 Wörter","intro":"2 Sätze warmherziger Einstieg","punkte":["Punkt 1 (1-2 Sätze praxisnah)","Punkt 2","Punkt 3","Punkt 4"],"takeaway":"1 Satz kraftvolle Kernbotschaft"}`}]})});
-    const d=await r.json();
-    const p=JSON.parse((d.content[0]?.text||'{}').replace(/```json|```/g,'').trim());
-    const ts=topic.replace(/'/g,"\\'");
-    const tks=(p.takeaway||'').replace(/`/g,"'").replace(/'/g,"\\'");
-    el.innerHTML=`<div class="nugcard">
-      <div class="ntitle">${p.title||topic}</div>
-      <div class="ntxt">${p.intro||''}<br><br>${(p.punkte||[]).map((x,i)=>`<strong>${i+1}.</strong> ${x}`).join('<br><br>')}</div>
-      <div class="ntk">${p.takeaway||''}</div>
-      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn bg2 bsm" onclick="loadN('${ts}')">↺ Neues Nugget</button>
-        <button class="btn bgold bsm" onclick="saveNJ('${ts}','${tks}')">Im Journal speichern 📓</button>
-      </div>
-    </div>`;
-  }catch{el.innerHTML='<div style="color:var(--muted);padding:24px;text-align:center;font-size:14px;">Fehler – bitte erneut versuchen.</div>';}
+    const d=await claudeFetch(`Erstelle 5 Lernkarten auf Deutsch zum Thema "${topic}" für eine weibliche Führungskraft. Du-Anrede großgeschrieben. Antworte NUR mit JSON ohne Markdown:\n{"karten":[{"titel":"Kurze prägnante Frage oder These (max 10 Wörter)","takeaway":"1 kraftvolle Kernbotschaft (1 Satz)","punkte":["Praxistipp 1 (1 Satz)","Praxistipp 2","Praxistipp 3"]},{"titel":"...","takeaway":"...","punkte":["...","...","..."]},{"titel":"...","takeaway":"...","punkte":["...","...","..."]},{"titel":"...","takeaway":"...","punkte":["...","...","..."]},{"titel":"...","takeaway":"...","punkte":["...","...","..."]}]}`,1200);
+    const parsed=JSON.parse((d.content[0]?.text||'{}').replace(/```json|```/g,'').trim());
+    ncCards=(parsed.karten||[]).slice(0,5);
+    ncIdx=0;ncFlipped=false;
+    document.getElementById('nug-loading').style.display='none';
+    document.getElementById('nug-deck').style.display='block';
+    document.getElementById('nc-tot').textContent=ncCards.length;
+    renderCard();
+  }catch(e){
+    document.getElementById('nug-loading').style.display='none';
+    document.getElementById('nug-empty').style.display='block';
+    document.getElementById('nug-empty').textContent=e.message==='Kein API Key'?'Bitte API Key in der Seitenleiste eingeben!':'Fehler beim Generieren – bitte erneut versuchen.';
+  }
+}
+
+function renderCard(){
+  if(!ncCards.length)return;
+  const c=ncCards[ncIdx];
+  // Reset flip
+  ncFlipped=false;
+  document.getElementById('nc-card').style.transform='rotateY(0deg)';
+  // Content
+  document.getElementById('nc-cur').textContent=ncIdx+1;
+  document.getElementById('nc-topic-tag').textContent=currentTopic;
+  document.getElementById('nc-front-title').textContent=c.titel||'';
+  document.getElementById('nc-back-text').textContent=c.takeaway||'';
+  document.getElementById('nc-back-points').innerHTML=(c.punkte||[]).map(p=>`<div style="font-size:13px;color:rgba(255,255,255,.85);padding:4px 0;display:flex;gap:8px;"><span style="color:rgba(255,255,255,.5);">✦</span>${p}</div>`).join('');
+  // Image
+  const img=document.getElementById('nc-img');
+  img.src=getImgUrl(currentTopic);
+  img.onerror=()=>{img.style.display='none';};
+  // Dots
+  document.getElementById('nc-dots').innerHTML=ncCards.map((_,i)=>`<div style="width:8px;height:8px;border-radius:50%;background:${i===ncIdx?'var(--m)':'var(--border)'};transition:background .2s;"></div>`).join('');
+  // Buttons
+  document.getElementById('nc-prev').style.opacity=ncIdx===0?'0.4':'1';
+  document.getElementById('nc-next').textContent=ncIdx===ncCards.length-1?'Fertig ✓':'Weiter →';
+}
+
+function flipCard(){
+  ncFlipped=!ncFlipped;
+  document.getElementById('nc-card').style.transform=ncFlipped?'rotateY(180deg)':'rotateY(0deg)';
+}
+function nextCard(){
+  if(ncIdx<ncCards.length-1){ncIdx++;renderCard();}
+  else{alert('Du hast alle '+ncCards.length+' Karten durchgearbeitet! 🎉\n\nLeg sie im Journal ab oder starte neue Karten.');}
+}
+function prevCard(){if(ncIdx>0){ncIdx--;renderCard();}}
+function saveCardToJournal(){
+  if(!ncCards.length)return;
+  const c=ncCards[ncIdx];
+  J.push({id:Date.now(),date:new Date().toLocaleDateString('de-DE'),em:'✨ Gelernt',txt:`Lernkarte: ${currentTopic}\n\n${c.titel}\n\n${c.takeaway}\n\n${(c.punkte||[]).join('\n')}`});
+  sv('dc_j',J);alert('Karte im Journal gespeichert! 📓');
 }
 function saveNJ(topic,tk){
   J.push({id:Date.now(),date:new Date().toLocaleDateString('de-DE'),em:'✨ Gelernt',txt:`Lernnugget: ${topic}\n\nKey Takeaway: ${tk}`});
   sv('dc_j',J);alert('Im Journal gespeichert! 📓');
 }
 
-// ── MODAL ──
+// ── API KEY ──
+function getApiKey(){return localStorage.getItem('dc_apikey')||'';}
+function saveApiKey(){
+  const k=document.getElementById('api-key-input').value.trim();
+  if(!k.startsWith('sk-ant-')){alert('Bitte einen gültigen Anthropic API Key eingeben (beginnt mit sk-ant-)');return;}
+  localStorage.setItem('dc_apikey',k);
+  document.getElementById('api-key-status').innerHTML='<span style="color:#2ecc71;">✓ Key gespeichert</span>';
+  setTimeout(()=>{document.getElementById('api-key-status').innerHTML='';},3000);
+}
+function checkApiKey(){
+  const k=getApiKey();
+  if(k){
+    document.getElementById('api-key-input').value=k.substring(0,12)+'...';
+    document.getElementById('api-key-status').innerHTML='<span style="color:#2ecc71;">✓ Key aktiv</span>';
+  }
+}
+async function claudeFetch(prompt,maxTokens=1000){
+  const k=getApiKey();
+  if(!k){
+    alert('Bitte zuerst Deinen Anthropic API Key in der Seitenleiste eingeben und speichern!');
+    throw new Error('Kein API Key');
+  }
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:maxTokens,messages:[{role:'user',content:prompt}]})
+  });
+  return await r.json();
+}
 function cm(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.mover').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 
@@ -945,8 +1100,7 @@ async function startReflexion(){
   try{
     const now=new Date();
     const kw=getKW(now);
-    const r=await fetchAnthropic('/v1/messages',{method:'POST',body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:`Erstelle 5 tiefe, warmherzige Wochen-Reflexionsfragen für KW ${kw} für eine weibliche Führungskraft (Doreen, Instagram-Brand "Clara – die smarte Karrierefrau"). Du-Anrede großgeschrieben. Jede Frage auf einer neuen Zeile. Abwechslungsreich: Erfolge, Herausforderungen, Energie, Beziehungen, Ziele. Nur die 5 Fragen, keine Nummerierung, kein anderer Text.`}]})});
-    const d=await r.json();
+    const d=await claudeFetch(`Erstelle 5 tiefe, warmherzige Wochen-Reflexionsfragen für KW ${kw} für eine weibliche Führungskraft (Doreen, Instagram-Brand "Clara – die smarte Karrierefrau"). Du-Anrede großgeschrieben. Jede Frage auf einer neuen Zeile. Abwechslungsreich: Erfolge, Herausforderungen, Energie, Beziehungen, Ziele. Nur die 5 Fragen, keine Nummerierung, kein anderer Text.`,600);
     reflQuestions=(d.content[0]?.text||'').split('\n').filter(q=>q.trim().length>5).slice(0,5);
     if(reflQuestions.length<3)reflQuestions=['Was war Dein größter Erfolg diese Woche?','Was hat Dich Energie gekostet – und was hat Dir Energie gegeben?','Was möchtest Du nächste Woche anders machen?','Wofür bist Du diese Woche dankbar?','Was hast Du über Dich selbst gelernt?'];
   }catch{reflQuestions=['Was war Dein größter Erfolg diese Woche?','Was hat Dich Energie gekostet – und was hat Dir Energie gegeben?','Was möchtest Du nächste Woche anders machen?','Wofür bist Du diese Woche dankbar?','Was hast Du über Dich selbst gelernt?'];}
@@ -1033,4 +1187,3 @@ init();
 </script>
 </body>
 </html>
-<command><H1></H1>
